@@ -1,21 +1,28 @@
 package com.hs.support;
 
 import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import common.bo.EntityObject;
 
 
 /**
  * 客服留言表
  */
-
-public class ChatMessage extends EntityObject<ChatMessage> implements Comparable<ChatMessage> {
+@TableName("support_chat_message")
+public class SupportChatMessage extends EntityObject<SupportChatMessage> implements Comparable<SupportChatMessage> {
 
     private static final long serialVersionUID = -4999012202564084751L;
 
+    public static final String SEND_DIR="send";
+
+    public static final String RECEIVE_DIR="receive";
+
+    @TableField("party_id")
     private Long partyId;
 
+    @TableField("no_login_id")
+    private String noLoginId;
 
-    private Long noLoginId;
     /**
      * 消息渠道
      *
@@ -54,19 +61,18 @@ public class ChatMessage extends EntityObject<ChatMessage> implements Comparable
     /**
      * 标记删除，true删除
      */
-    @TableField("isdel")
-    private boolean isdel = false;
+    @TableField("deleted")
+    private boolean deleted = false;
 
-    private String ip;
 
     @TableField("created_time")
     private Long createdTime;
     @Override
-    public int compareTo(ChatMessage chatMessage) {
+    public int compareTo(SupportChatMessage supportChatMessage) {
 
-        if (this.createdTime > chatMessage.getCreatedTime()) {
+        if (this.createdTime > supportChatMessage.getCreatedTime()) {
             return 1;
-        } else if (this.createdTime < chatMessage.getCreatedTime()) {
+        } else if (this.createdTime < supportChatMessage.getCreatedTime()) {
             return -1;
         }
         return 0;
@@ -120,12 +126,12 @@ public class ChatMessage extends EntityObject<ChatMessage> implements Comparable
         this.responder = responder;
     }
 
-    public boolean isIsdel() {
-        return isdel;
+    public boolean isDeleted() {
+        return deleted;
     }
 
-    public void setIsdel(boolean isdel) {
-        this.isdel = isdel;
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
     }
 
     public Long getCreatedTime() {
@@ -136,19 +142,12 @@ public class ChatMessage extends EntityObject<ChatMessage> implements Comparable
         this.createdTime = createdTime;
     }
 
-    public String getIp() {
-        return ip;
-    }
-
-    public void setIp(String ip) {
-        this.ip = ip;
-    }
-
-    public Long getNoLoginId() {
+    public String getNoLoginId() {
         return noLoginId;
     }
 
-    public void setNoLoginId(Long noLoginId) {
+    public void setNoLoginId(String noLoginId) {
         this.noLoginId = noLoginId;
     }
+
 }

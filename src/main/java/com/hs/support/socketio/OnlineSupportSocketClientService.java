@@ -1,12 +1,34 @@
 package com.hs.support.socketio;
 
-import com.hs.support.socketio.message.ReqReadMsg;
-import com.hs.support.socketio.message.ReqSendMsg;
+import com.hs.support.socketio.message.*;
 
 public interface OnlineSupportSocketClientService {
 
-    public void send(ReqSendMsg message);
 
+    /**
+     * Socket连接
+     */
+    void connect(ConnectMessage message);
 
-    public void read(ReqReadMsg message);
+    /**
+     *  断开连接
+     * @param message
+     */
+    void disconnect(DisconnectMessage message);
+    /**
+     * Socket关联用户
+     */
+    void user(ReqUser message);
+
+    /**
+     * 发送消息
+     * @param message
+     */
+    void send(ReqSendMsg message);
+
+    /**
+     * 已读消息
+     * @param message
+     */
+    void read(ReqReadMsg message);
 }

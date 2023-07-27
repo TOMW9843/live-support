@@ -1,25 +1,32 @@
 package com.hs.support;
 
+import com.baomidou.mybatisplus.annotation.TableField;
+import com.baomidou.mybatisplus.annotation.TableName;
 import common.bo.EntityObject;
 
 /**
  * 消息列表
  */
-public class ChatInfo extends EntityObject<ChatInfo> implements Comparable<ChatInfo> {
+@TableName("support_chat_info")
+public class SupportChatInfo extends EntityObject<SupportChatInfo> implements Comparable<SupportChatInfo> {
 
     private static final long serialVersionUID = -7768174302895619763L;
 
+    @TableField("party_id")
     private Long partyId;
 
-    private Long noLoginId;
+    @TableField("no_login_id")
+    private String noLoginId;
 
     /**
      * 用户未读消息数
      */
+    @TableField("user_unread_num")
     private int userUnreadNum;
     /**
      * 客服未读消息数
      */
+    @TableField("account_manager_unread_num")
     private int accountManagerUnreadNum;
 
     /**
@@ -30,23 +37,35 @@ public class ChatInfo extends EntityObject<ChatInfo> implements Comparable<ChatI
     /**
      * 最后回复的客服-partyId
      */
+    @TableField("last_responder")
     private Long lastResponder;
+
+    @TableField("ip")
+    private String ip;
+
+    @TableField(exist = false)
+    private String nickName;
+
+    @TableField(exist = false)
+    private String avatar;
 
     /**
      * 最后消息，不需要保存数据库
      */
-    private String lastmsg;
+    @TableField(exist = false)
+    private String lastMsg;
 
     /**
      * 最后更新时间，不需要保存数据库
      */
+    @TableField(exist = false)
     private Long lastTime;
 
     @Override
-    public int compareTo(ChatInfo chatInfo) {
-        if (this.lastTime > chatInfo.getLastTime()) {
+    public int compareTo(SupportChatInfo supportChatInfo) {
+        if (this.lastTime > supportChatInfo.getLastTime()) {
             return -1;
-        } else if (this.lastTime < chatInfo.getLastTime()) {
+        } else if (this.lastTime < supportChatInfo.getLastTime()) {
             return 1;
         }
         return 0;
@@ -60,11 +79,11 @@ public class ChatInfo extends EntityObject<ChatInfo> implements Comparable<ChatI
         this.partyId = partyId;
     }
 
-    public Long getNoLoginId() {
+    public String getNoLoginId() {
         return noLoginId;
     }
 
-    public void setNoLoginId(Long noLoginId) {
+    public void setNoLoginId(String noLoginId) {
         this.noLoginId = noLoginId;
     }
 
@@ -100,12 +119,12 @@ public class ChatInfo extends EntityObject<ChatInfo> implements Comparable<ChatI
         this.lastResponder = lastResponder;
     }
 
-    public String getLastmsg() {
-        return lastmsg;
+    public String getLastMsg() {
+        return lastMsg;
     }
 
-    public void setLastmsg(String lastmsg) {
-        this.lastmsg = lastmsg;
+    public void setLastMsg(String lastMsg) {
+        this.lastMsg = lastMsg;
     }
 
     public Long getLastTime() {
@@ -114,5 +133,29 @@ public class ChatInfo extends EntityObject<ChatInfo> implements Comparable<ChatI
 
     public void setLastTime(Long lastTime) {
         this.lastTime = lastTime;
+    }
+
+    public String getIp() {
+        return ip;
+    }
+
+    public void setIp(String ip) {
+        this.ip = ip;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    public String getAvatar() {
+        return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 }
