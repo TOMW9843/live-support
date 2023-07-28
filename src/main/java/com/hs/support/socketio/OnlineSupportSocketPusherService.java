@@ -1,6 +1,7 @@
 package com.hs.support.socketio;
 
 import com.hs.socketio.IdSession;
+import com.hs.support.SupportChatInfo;
 import com.hs.support.SupportChatMessage;
 import party.Party;
 
@@ -27,4 +28,13 @@ public interface OnlineSupportSocketPusherService {
      * @param party              方
      */
     void supportUnReadMessage(List<SupportChatMessage> supportChatMessage, IdSession idSession, Party party);
+
+
+    /**
+     * 客服接收用户列表数据更新
+     *
+     * @param supportChatInfo 支持聊天信息
+     * @param idSession       会话id
+     */
+    void supportReceiveUser(SupportChatInfo supportChatInfo,IdSession idSession);
 }

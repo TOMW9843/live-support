@@ -4,10 +4,12 @@ import com.hs.socketio.IdSession;
 import com.hs.socketio.IdSessionManager;
 import com.hs.socketio.MessagePusher;
 import com.hs.support.SocketIOContext;
+import com.hs.support.SupportChatInfo;
 import com.hs.support.SupportChatMessage;
 import com.hs.support.socketio.OnlineSupportSocketPusherService;
 import com.hs.support.socketio.message.ReceiveMsg;
 import com.hs.support.socketio.message.ResReceiveMsg;
+import com.hs.support.socketio.message.ResReceiveUser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,6 +94,29 @@ public class OnlineSupportSocketPusherServiceImpl implements OnlineSupportSocket
         } catch (Throwable t) {
 
             logger.error("[程序错误] OnlineSupportSocketPusherService.supportUnReadMessage(List<SupportChatMessage> supportChatMessage, IdSession idSession, Party party) fail", t);
+        }
+    }
+
+    @Override
+    public void supportReceiveUser(SupportChatInfo info, IdSession idSession) {
+        try {
+            ResReceiveUser packet=new ResReceiveUser();
+
+            packet.setChatId(info.getId());
+            packet.setAvatar(info.getAvatar());
+            packet.setIp(info.getIp());
+            packet.setLastMsg(info.getLastMsg());
+            packet.setLastTime(info.getLastTime());
+            packet.setNoLoginId(info.getNoLoginId());
+            packet.setPartyId(info.getPartyId());
+            packet.setUnReadNum(info.getAccountManagerUnreadNum());
+
+            //向客户端发送消息
+            messagePusher.pushMessage(SocketIOContext.NAMESPACE, ResReceiveUser.EVENTNAME, idSession.getClient().getSessionId(), packet);
+
+        } catch (Throwable t) {
+
+            logger.error("[程序错误] OnlineSupportSocketPusherService.supportReceiveUser(SupportChatInfo supportChatInfo, IdSession idSession) fail", t);
         }
     }
 }

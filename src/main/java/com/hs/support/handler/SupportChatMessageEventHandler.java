@@ -12,9 +12,7 @@ import com.hs.socketio.IdSessionManager;
 import com.hs.socketio.support.MessageEventHandler;
 import com.hs.socketio.support.MessageQueue;
 import com.hs.support.SocketIOContext;
-import com.hs.support.socketio.message.ConnectMessage;
-import com.hs.support.socketio.message.DisconnectMessage;
-import com.hs.support.socketio.message.ReqUser;
+import com.hs.support.socketio.message.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -59,6 +57,27 @@ public class SupportChatMessageEventHandler extends MessageEventHandler {
         JSONObject obj = JSONObject.parseObject(data);
         ReqUser message= JSONObject.toJavaObject(obj, ReqUser.class);
         message.setEvent(ReqUser.EVENTNAME);
+        message.setClient(client);
+        supportChatMessageQueue.add(message);
+    }
+
+    @OnEvent(value = "supportSendMsg")
+    public void send(SocketIOClient client, AckRequest ackRequest, String data) {
+
+        JSONObject obj = JSONObject.parseObject(data);
+        ReqSendMsg message= JSONObject.toJavaObject(obj, ReqSendMsg.class);
+        message.setEvent(ReqSendMsg.EVENTNAME);
+        message.setClient(client);
+        supportChatMessageQueue.add(message);
+    }
+
+
+    @OnEvent(value = "supportReadMsg")
+    public void read(SocketIOClient client, AckRequest ackRequest, String data) {
+
+        JSONObject obj = JSONObject.parseObject(data);
+        ReqReadMsg message= JSONObject.toJavaObject(obj, ReqReadMsg.class);
+        message.setEvent(ReqReadMsg.EVENTNAME);
         message.setClient(client);
         supportChatMessageQueue.add(message);
     }

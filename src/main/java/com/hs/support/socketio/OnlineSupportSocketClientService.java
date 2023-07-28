@@ -31,4 +31,12 @@ public interface OnlineSupportSocketClientService {
      * @param message
      */
     void read(ReqReadMsg message);
+
+
+    /**
+     * 删除消息,使用','分隔
+     *
+     * @param msgIds 味精id
+     */
+    void del(String msgIds);
 }

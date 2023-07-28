@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hs.support.mapper.SupportChatMessageMapper">
+
+    <select id="pagedQuery" resultType="java.util.Map">
+        select m.id msgId,m.direction,m.cmd channel,m.type,m.content,m.created_time sendTime,p.nick_name,p.avatar
+        from support_chat_message m
+        left join party p on p.id= m.party_id
+        where m.deleted=0 and m.created_time &lt; #{timestamp}
+        <choose>
+            <when test="partyId !=null">
+                and m.party_id=#{partyId}
+            </when>
+            <otherwise>
+                and m.no_login_id=#{noLoginId}
+            </otherwise>
+        </choose>
+        order by m.created_time ASC
+        limit 20
+    </select>
+
+</mapper>

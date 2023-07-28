@@ -4,10 +4,7 @@ package com.hs.support.socketio.thread;
 import com.hs.socketio.support.MessageQueue;
 import com.hs.socketio.support.RequestMessage;
 import com.hs.support.socketio.OnlineSupportSocketClientService;
-import com.hs.support.socketio.message.ConnectMessage;
-import com.hs.support.socketio.message.DisconnectMessage;
-import com.hs.support.socketio.message.ReqUser;
-import com.hs.support.socketio.message.ReqSendMsg;
+import com.hs.support.socketio.message.*;
 import common.util.ThreadUtils;
 import framework.context.WorkerThread;
 import framework.thread.CustomThreadPool;
@@ -102,6 +99,11 @@ public class SupportChatMessageDispatcherWorkerThread implements WorkerThread, R
                     break;
                 case ReqSendMsg.EVENTNAME:
                     onlineSupportSocketClientService.send((ReqSendMsg)item);
+                    break;
+                case ReqReadMsg.EVENTNAME:
+                    onlineSupportSocketClientService.read((ReqReadMsg)item);
+                    break;
+
             }
 
         } catch (Throwable t) {

@@ -14,6 +14,10 @@ public class Constants {
 
     public static final String REDIS_KEY_SUPPORT_CHAT_MESSAGE_USER_NO_LOGIN_ID ="com:hs:support:chatMessage:user:noLoginId";
 
-    //  string //
-    public static final String CS_ROLE="customer-service";
+    /* 客服黑名单缓存 */
+    public static final String REDIS_KEY_SUPPORT_CHAT_BLACK_LIST ="com:hs:support:chatBlackList";
+
+
+    /* 客服和管理员角色 */
+    public static final String CS_ROLE="customer-service_root";
 }

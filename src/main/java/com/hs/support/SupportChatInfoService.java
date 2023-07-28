@@ -1,12 +1,8 @@
 package com.hs.support;
 
-public interface SupportChatInfoService {
+import java.util.List;
 
-    /**
-     * 已读
-     * @param role user-用户  AM-客服
-     */
-    void read(Long partyId,String noLoginId,String role);
+public interface SupportChatInfoService {
 
 
     /**
@@ -22,8 +18,11 @@ public interface SupportChatInfoService {
 
     SupportChatInfo findByPartyId(Long partyId);
 
+    List<SupportChatInfo> findByTime(Long timestamp,int pageSize);
 
     void insert(SupportChatInfo supportChatInfo);
 
     void update(SupportChatInfo supportChatInfo);
+
+    void setRemark(Long chatId,String remarks);
 }

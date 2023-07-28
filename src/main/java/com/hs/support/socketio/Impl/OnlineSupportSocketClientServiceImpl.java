@@ -18,6 +18,7 @@ import party.PartyService;
 import security.token.SecurityTokenService;
 import security.token.Token;
 
+import javax.crypto.MacSpi;
 import javax.servlet.http.Part;
 import java.util.Arrays;
 import java.util.List;
@@ -71,7 +72,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
             /**
              * 如果是客服
              */
-            if (party.getRole().equals(Constants.CS_ROLE)) {
+            if (Constants.CS_ROLE.contains(party.getRole())) {
                 idSession.setAttribute("party", party);
                 customerServerOnlineMap.put(idSession.getClient().getSessionId().toString(), idSession);
             }
@@ -130,7 +131,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
         boolean isUser = false;
         try {
             //客服
-            if (party != null && party.getRole().equals(Constants.CS_ROLE)) {
+            if (party != null && Constants.CS_ROLE.contains(party.getRole())) {
                 chatMessage = onlineSupportSocketMessageService.createCustomerServiceMessage(message, party);
             }
             //玩家发送消息
@@ -140,7 +141,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
                 isUser = true;
             }
 
-
+            SupportChatInfo chatInfo=null;
             //发送消息
             if (chatMessage != null) {
 
@@ -150,10 +151,16 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
                 }
 
                 if (isUser) {
-                    sendToCustomServer(chatMessage, idSession, party);
+                    chatInfo=sendToCustomServer(chatMessage, idSession, party);
                 } else {
-                    sendToUser(chatMessage, idSession);
+                    chatInfo=sendToUser(chatMessage, idSession);
                 }
+            }
+
+            //发送用户列表数据更新
+            for (Map.Entry<String, IdSession> kv : customerServerOnlineMap.entrySet()) {
+
+                onlineSupportSocketPusherService.supportReceiveUser(chatInfo, kv.getValue());
             }
 
 
@@ -172,7 +179,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
      * @param chatMessage 聊天信息
      * @param session     会话
      */
-    private void sendToCustomServer(SupportChatMessage chatMessage, IdSession session, Party party) {
+    private SupportChatInfo sendToCustomServer(SupportChatMessage chatMessage, IdSession session, Party party) {
 
 
         SupportChatInfo chatInfo = party == null ? supportChatInfoService.findByNoLoginId(session.getNoLoginId()) : supportChatInfoService.findByPartyId(party.getId());
@@ -195,6 +202,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
             onlineSupportSocketPusherService.supportReceiveMessage(chatMessage, kv.getValue(), party);
         }
 
+        return chatInfo;
 
     }
 
@@ -204,7 +212,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
      *
      * @param chatMessage 聊天信息
      */
-    private void sendToUser(SupportChatMessage chatMessage, IdSession idSession) {
+    private SupportChatInfo sendToUser(SupportChatMessage chatMessage, IdSession idSession) {
 
         SupportChatInfo chatInfo = chatMessage.getPartyId() == null ? supportChatInfoService.findByNoLoginId(chatMessage.getNoLoginId()) : supportChatInfoService.findByPartyId(chatMessage.getPartyId());
         chatInfo.setUserUnreadNum(chatInfo.getUserUnreadNum() + 1);
@@ -227,6 +235,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
             onlineSupportSocketPusherService.supportReceiveMessage(chatMessage, userSession, party);
         }
 
+        return chatInfo;
 
     }
 
@@ -263,6 +272,29 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
             logger.error("OnlineSupportSocketClientService.read(ReqReadMsg message)消息发送失败--noLoginId:{},partyId:{}", message.getNoLoginId(), message.getPartyId());
             logger.error("OnlineSupportSocketClientService.read(ReqReadMsg message)消息发送失败--error:{},trace:{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
             messagePusher.pushMessage(SocketIOContext.NAMESPACE, ResReadMsg.EVENTNAME, idSession.getClient().getSessionId(), new ResReadMsg("500", "已读回执失败"));
+        }
+
+    }
+
+    @Override
+    public void del(String msgIdStr) {
+
+        String[] ids=msgIdStr.split(",");
+        if(ids.length>0){
+
+            List<String> msgIds=Arrays.asList(ids);
+
+            //假删除消息
+            supportChatMessageService.delMsg(msgIds);
+
+            //通知客户和用户回撤
+
+            ResRevocationMsg msg=new ResRevocationMsg();
+            msg.setMsgIds(msgIds);
+
+            //回撤广播
+            messagePusher.pushMessage(SocketIOContext.NAMESPACE, ResRevocationMsg.EVENTNAME, msg);
+
         }
 
     }

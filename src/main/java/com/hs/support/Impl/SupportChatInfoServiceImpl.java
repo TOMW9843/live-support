@@ -10,6 +10,11 @@ import org.apache.tomcat.util.bcel.Const;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @Service
 public class SupportChatInfoServiceImpl extends ServiceImpl<SupportChatInfoMapper, SupportChatInfo> implements SupportChatInfoService {
 
@@ -20,16 +25,10 @@ public class SupportChatInfoServiceImpl extends ServiceImpl<SupportChatInfoMappe
 
 
     @Override
-    public void read(Long partyId, String noLoginId, String role) {
-
-
-    }
-
-    @Override
     public boolean hasChatInfo(String noLoginId, Long partyId) {
 
         if(partyId==null)
-            return redisService.hHasKey(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_NO_LOGIN_ID,noLoginId.toString());
+            return redisService.hHasKey(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_NO_LOGIN_ID,noLoginId);
         else
             return redisService.hHasKey(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_PARTY_ID,partyId.toString());
 
@@ -53,6 +52,25 @@ public class SupportChatInfoServiceImpl extends ServiceImpl<SupportChatInfoMappe
         return null;
     }
 
+    @Override
+    public List<SupportChatInfo> findByTime(Long timestamp,int pageSize) {
+        Map<Object,Object> queryMap=redisService.hmget(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_NO_LOGIN_ID);
+        queryMap.putAll(redisService.hmget(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_PARTY_ID));
+        List<Object> list= Arrays.asList(queryMap.values());
+        if(list.size()>0){
+
+            List<SupportChatInfo> result= list.stream()
+                    .map(item-> (SupportChatInfo)item)
+                    .filter(item->item.getLastTime()!=null&&item.getLastTime()<timestamp)
+                    .sorted(SupportChatInfo::compareTo)
+                    .limit(pageSize)
+                    .collect(Collectors.toList());
+            return result;
+        }
+
+        return null;
+    }
+
 
     @Override
     public void insert(SupportChatInfo supportChatInfo) {
@@ -68,9 +86,38 @@ public class SupportChatInfoServiceImpl extends ServiceImpl<SupportChatInfoMappe
     @Override
     public void update(SupportChatInfo supportChatInfo) {
         if(supportChatInfo.getPartyId()==null)
-            redisService.hset(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_NO_LOGIN_ID,supportChatInfo.getNoLoginId().toString(),supportChatInfo);
+            redisService.hset(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_NO_LOGIN_ID,supportChatInfo.getNoLoginId(),supportChatInfo);
         else
             redisService.hset(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_PARTY_ID,supportChatInfo.getPartyId().toString(),supportChatInfo);
+    }
+
+    @Override
+    public void setRemark(Long chatId, String remarks) {
+
+         SupportChatInfo chatInfo=this.getById(chatId);
+         if(chatInfo!=null){
+             chatInfo.setRemarks(remarks);
+             String noLoginId=chatInfo.getNoLoginId();
+             Long partyId=chatInfo.getPartyId();
+             this.updateById(chatInfo);
+
+             Object obj=null;
+             if(partyId!=null)
+             {
+                 obj=redisService.hget(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_PARTY_ID,partyId.toString());
+             }else{
+                 obj=redisService.hget(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_NO_LOGIN_ID,noLoginId);
+             }
+             if(obj!=null){
+                 chatInfo=(SupportChatInfo)obj;
+                 chatInfo.setRemarks(remarks);
+                 if(partyId!=null)
+                     redisService.hset(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_PARTY_ID,partyId.toString(),chatInfo);
+                 else
+                     redisService.hset(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_NO_LOGIN_ID,noLoginId,chatInfo);
+             }
+
+         }
     }
 
 
