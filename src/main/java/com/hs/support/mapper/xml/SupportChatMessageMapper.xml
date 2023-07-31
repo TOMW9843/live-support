@@ -2,7 +2,18 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.hs.support.mapper.SupportChatMessageMapper">
 
-    <select id="pagedQuery" resultType="java.util.Map">
+    <resultMap id="supportChatMessageMap" type="java.util.Map">
+        <id column="msgId" property="msgId" javaType="java.lang.String"/>
+        <result column="direction" property="direction"/>
+        <result column="cmd" property="channel"/>
+        <result column="type" property="type"/>
+        <result column="content" property="content"/>
+        <result column="sendTime" property="sendTime"/>
+        <result column="nick_name" property="nickName"/>
+        <result column="avatar" property="avatar"/>
+    </resultMap>
+
+    <select id="pagedQuery" resultMap="supportChatMessageMap">
         select m.id msgId,m.direction,m.cmd channel,m.type,m.content,m.created_time sendTime,p.nick_name,p.avatar
         from support_chat_message m
         left join party p on p.id= m.party_id

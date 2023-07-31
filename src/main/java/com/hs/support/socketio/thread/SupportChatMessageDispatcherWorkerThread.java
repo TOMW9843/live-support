@@ -44,7 +44,7 @@ public class SupportChatMessageDispatcherWorkerThread implements WorkerThread, R
         new Thread(this, "supportChatMessageDispatcherWorkerThread").start();
 
         if (logger.isInfoEnabled()) {
-            logger.info("[---客服消息分发线程已开启---]");
+            logger.info("[---[support]客服消息分发线程已开启---]");
         }
 
 
