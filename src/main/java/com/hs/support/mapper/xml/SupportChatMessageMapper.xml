@@ -26,7 +26,7 @@
                 and m.no_login_id=#{noLoginId}
             </otherwise>
         </choose>
-        order by m.created_time ASC
+        order by m.created_time DESC
         limit 20
     </select>
 

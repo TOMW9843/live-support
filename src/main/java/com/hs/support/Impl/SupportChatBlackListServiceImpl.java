@@ -30,34 +30,38 @@ public class SupportChatBlackListServiceImpl extends ServiceImpl<SupportChatBlac
     @Override
     public Map<String, Object> blackList(String ip, int pageIndex, int pageSize) throws Exception {
         List<SupportChatBlackList> list=supportChatBlackListMapper.pagedQuery(ip,new Page(pageIndex,pageSize).getOffset(),pageSize);
-        List<String> result=list.stream().map(SupportChatBlackList::getIp).collect(Collectors.toList());
         Map<String,Object> map=new HashMap<>();
-        map.put("info",result);
+        map.put("info",list);
         map.put("pageIndex",pageIndex);
+        map.put("pageSize",list.size());
         return map;
     }
 
     @Override
-    public void addBlackList(String ip, String remarks) throws Exception {
-        Object obj=redisService.hget(Constants.REDIS_KEY_SUPPORT_CHAT_BLACK_LIST,ip);
+    public void addBlackList(String ip,String noLoginId, String remarks) throws Exception {
+
+        Object obj=redisService.hget(Constants.REDIS_KEY_SUPPORT_CHAT_BLACK_LIST,ip+noLoginId);
         if(obj==null){
 
             SupportChatBlackList msg=new SupportChatBlackList();
             msg.setIp(ip);
+            msg.setNoLoginId(noLoginId);
             msg.setRemarks(remarks);
             this.save(msg);
 
-            redisService.hset(Constants.REDIS_KEY_SUPPORT_CHAT_BLACK_LIST,ip,msg);
+            redisService.hset(Constants.REDIS_KEY_SUPPORT_CHAT_BLACK_LIST,ip+noLoginId,msg);
 
         }
     }
 
     @Override
-    public void removeBlackList(String ip) throws Exception {
-        LambdaQueryWrapper<SupportChatBlackList> ew=new LambdaQueryWrapper<>();
-        ew.eq(SupportChatBlackList::getIp,ip);
-        this.remove(ew);
+    public void removeBlackList(String id) throws Exception {
+        SupportChatBlackList item=this.getById(id);
 
-        redisService.hdel(Constants.REDIS_KEY_SUPPORT_CHAT_BLACK_LIST,ip);
+        if(item!=null){
+            this.removeById(id);
+            redisService.hdel(Constants.REDIS_KEY_SUPPORT_CHAT_BLACK_LIST,item.getIp()+item.getNoLoginId());
+        }
+
     }
 }

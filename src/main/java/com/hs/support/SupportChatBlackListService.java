@@ -24,14 +24,14 @@ public interface SupportChatBlackListService {
      * @param remarks 讲话
      * @throws Exception 异常
      */
-    void addBlackList(String ip,String remarks) throws Exception;
+    void addBlackList(String ip,String noLoginId,String remarks) throws Exception;
 
 
     /**
      * 删除黑名单
      *
-     * @param ip 知识产权
+     * @param id 知识产权
      * @throws Exception 异常
      */
-    void removeBlackList(String ip) throws Exception;
+    void removeBlackList(String id) throws Exception;
 }

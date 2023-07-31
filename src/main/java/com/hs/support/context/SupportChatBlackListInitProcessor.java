@@ -45,7 +45,7 @@ public class SupportChatBlackListInitProcessor implements InitializingLineRunner
             }
             Map<String, Object> map = new HashMap<String, Object>();
             for (int i = 0; i < list.size(); i++) {
-                map.put(String.valueOf(list.get(i).getIp()), list.get(i));
+                map.put(list.get(i).getIp()+list.get(i).getNoLoginId(), list.get(i));
             }
             redisService.hmset(Constants.REDIS_KEY_SUPPORT_CHAT_BLACK_LIST,map);
 

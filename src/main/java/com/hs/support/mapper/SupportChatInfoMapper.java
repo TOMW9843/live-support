@@ -10,5 +10,5 @@ import java.util.Map;
 
 public interface SupportChatInfoMapper extends BaseMapper<SupportChatInfo> {
 
-
+    List<Map<String,Object>> findUser(@Param("parameters")String parameters);
 }

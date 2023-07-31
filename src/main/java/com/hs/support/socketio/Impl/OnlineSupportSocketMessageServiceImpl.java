@@ -22,6 +22,7 @@ import security.model.SecUser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class OnlineSupportSocketMessageServiceImpl implements OnlineSupportSocketMessageService {
@@ -153,14 +154,16 @@ public class OnlineSupportSocketMessageServiceImpl implements OnlineSupportSocke
 
             for (SupportChatInfo info : chatInfos) {
                SupportChatInfoUserList item =new SupportChatInfoUserList();
-               item.setChatId(info.getId());
+               item.setChatId(info.getId().toString());
                item.setAvatar(info.getAvatar());
                item.setIp(info.getIp());
                item.setLastMsg(info.getLastMsg());
                item.setLastTime(info.getLastTime());
                item.setNoLoginId(info.getNoLoginId());
-               item.setPartyId(info.getPartyId());
+               item.setPartyId(info.getPartyId()!=null ? info.getPartyId().toString():null);
                item.setUnReadNum(info.getAccountManagerUnreadNum());
+               item.setNickName(info.getNickName());
+               item.setRemarks(info.getRemarks());
 
                result.add(item);
             }
@@ -169,4 +172,5 @@ public class OnlineSupportSocketMessageServiceImpl implements OnlineSupportSocke
         }
         return null;
     }
+
 }

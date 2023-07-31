@@ -5,9 +5,9 @@ import java.io.Serializable;
 public class SupportChatInfoUserList implements Serializable {
     private static final long serialVersionUID = 3217593132788515139L;
 
-    private Long chatId;
+    private String chatId;
 
-    private Long partyId;
+    private String partyId;
 
     private String noLoginId;
 
@@ -23,19 +23,21 @@ public class SupportChatInfoUserList implements Serializable {
 
     private String ip;
 
-    public Long getChatId() {
+    private String remarks;
+
+    public String getChatId() {
         return chatId;
     }
 
-    public void setChatId(Long chatId) {
+    public void setChatId(String chatId) {
         this.chatId = chatId;
     }
 
-    public Long getPartyId() {
+    public String getPartyId() {
         return partyId;
     }
 
-    public void setPartyId(Long partyId) {
+    public void setPartyId(String partyId) {
         this.partyId = partyId;
     }
 
@@ -93,5 +95,13 @@ public class SupportChatInfoUserList implements Serializable {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    public String getRemarks() {
+        return remarks;
+    }
+
+    public void setRemarks(String remarks) {
+        this.remarks = remarks;
     }
 }

@@ -1,6 +1,7 @@
 package com.hs.support;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SupportChatInfoService {
 
@@ -25,4 +26,6 @@ public interface SupportChatInfoService {
     void update(SupportChatInfo supportChatInfo);
 
     void setRemark(Long chatId,String remarks);
+
+    List<Map<String,Object>> findUser(String parameters);
 }

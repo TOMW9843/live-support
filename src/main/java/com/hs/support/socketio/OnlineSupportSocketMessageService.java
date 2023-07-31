@@ -7,6 +7,7 @@ import com.hs.support.socketio.message.ReqSendMsg;
 import party.Party;
 
 import java.util.List;
+import java.util.Map;
 
 public interface OnlineSupportSocketMessageService {
 
@@ -48,4 +49,5 @@ public interface OnlineSupportSocketMessageService {
      * @throws Exception 异常
      */
     List<SupportChatInfoUserList> chatInfoUserList(Long timestamp,int pageSize) throws Exception;
+
 }

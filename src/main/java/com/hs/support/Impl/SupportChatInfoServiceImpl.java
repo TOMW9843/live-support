@@ -7,6 +7,7 @@ import com.hs.support.SupportChatInfoService;
 import com.hs.support.mapper.SupportChatInfoMapper;
 import framework.redis.RedisService;
 import org.apache.tomcat.util.bcel.Const;
+import org.omg.Messaging.SYNC_WITH_TRANSPORT;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +23,9 @@ public class SupportChatInfoServiceImpl extends ServiceImpl<SupportChatInfoMappe
 
     @Autowired
     RedisService redisService;
+
+    @Autowired
+    SupportChatInfoMapper supportChatInfoMapper;
 
 
     @Override
@@ -56,7 +60,7 @@ public class SupportChatInfoServiceImpl extends ServiceImpl<SupportChatInfoMappe
     public List<SupportChatInfo> findByTime(Long timestamp,int pageSize) {
         Map<Object,Object> queryMap=redisService.hmget(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_NO_LOGIN_ID);
         queryMap.putAll(redisService.hmget(Constants.REDIS_KEY_SUPPORT_CHAT_INFO_PARTY_ID));
-        List<Object> list= Arrays.asList(queryMap.values());
+        List<Object> list= Arrays.asList(queryMap.values().toArray());
         if(list.size()>0){
 
             List<SupportChatInfo> result= list.stream()
@@ -118,6 +122,11 @@ public class SupportChatInfoServiceImpl extends ServiceImpl<SupportChatInfoMappe
              }
 
          }
+    }
+
+    @Override
+    public List<Map<String, Object>> findUser(String parameters) {
+        return supportChatInfoMapper.findUser(parameters);
     }
 
 
