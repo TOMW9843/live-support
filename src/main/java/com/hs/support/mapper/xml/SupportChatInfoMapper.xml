@@ -6,14 +6,16 @@
         <id column="id" property="chatId" javaType="java.lang.String"/>
         <result column="nick_name" property="nickName"/>
         <result column="avatar" property="avatar"/>
+        <result column="partyId" property="partyId" javaType="java.lang.String"/>
     </resultMap>
 
     <select id="findUser" resultMap="supportChatInfoFindUserMap">
-        select c.id,p.nick_name,p.avatar
+        select c.id,p.nick_name,p.avatar,p.id partyId
         from party p
         left join support_chat_info c on p.id= c.party_id
-        where p.user_name like concat('%',#{parameters},'%') or p.nick_name like concat('%',#{parameters},'%') or
-            p.user_code like concat('%',#{parameters},'%') or c.remarks like concat('%',#{parameters},'%')
+        where p.role='user' and
+            (p.user_name like concat('%',#{parameters},'%') or p.nick_name like concat('%',#{parameters},'%') or
+            p.user_code like concat('%',#{parameters},'%') or c.remarks like concat('%',#{parameters},'%'))
         order by c.party_id DESC
         limit 20
     </select>

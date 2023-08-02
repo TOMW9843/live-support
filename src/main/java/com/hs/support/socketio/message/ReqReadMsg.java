@@ -10,6 +10,8 @@ public class ReqReadMsg extends RequestMessage {
 
     private String noLoginId;
 
+    private String direction;
+
     public Long getPartyId() {
         return partyId;
     }
@@ -24,5 +26,13 @@ public class ReqReadMsg extends RequestMessage {
 
     public void setNoLoginId(String noLoginId) {
         this.noLoginId = noLoginId;
+    }
+
+    public String getDirection() {
+        return direction;
+    }
+
+    public void setDirection(String direction) {
+        this.direction = direction;
     }
 }

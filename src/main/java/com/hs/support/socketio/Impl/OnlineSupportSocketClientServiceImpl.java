@@ -81,7 +81,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
              */
             else {
 
-                List<SupportChatMessage> msgs = supportChatMessageService.unReadMsg(null, party.getId(),SupportChatMessage.RECEIVE_DIR);
+                List<SupportChatMessage> msgs = supportChatMessageService.unReadMsg(null, party.getId(), SupportChatMessage.RECEIVE_DIR);
                 if (msgs != null) {
                     onlineSupportSocketPusherService.supportUnReadMessage(msgs, idSession, party);
                 }
@@ -91,7 +91,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
         //未登录用户的未读消息提示
         else if (idSession.getNoLoginId() != null) {
 
-            List<SupportChatMessage> msgs = supportChatMessageService.unReadMsg(idSession.getNoLoginId(), null,SupportChatMessage.RECEIVE_DIR);
+            List<SupportChatMessage> msgs = supportChatMessageService.unReadMsg(idSession.getNoLoginId(), null, SupportChatMessage.RECEIVE_DIR);
             if (msgs != null) {
                 onlineSupportSocketPusherService.supportUnReadMessage(msgs, idSession, null);
             }
@@ -141,7 +141,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
                 isUser = true;
             }
 
-            SupportChatInfo chatInfo=null;
+            SupportChatInfo chatInfo = null;
             //发送消息
             if (chatMessage != null) {
 
@@ -151,9 +151,9 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
                 }
 
                 if (isUser) {
-                    chatInfo=sendToCustomServer(chatMessage, idSession, party);
+                    chatInfo = sendToCustomServer(chatMessage, idSession, party);
                 } else {
-                    chatInfo=sendToUser(chatMessage, idSession);
+                    chatInfo = sendToUser(chatMessage, idSession);
                 }
             }
 
@@ -250,23 +250,29 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
             return;
         try {
 
-            SupportChatInfo chatInfo = message.getPartyId() == null ? supportChatInfoService.findByNoLoginId(message.getNoLoginId()) : supportChatInfoService.findByPartyId(message.getPartyId());
-            String direction="";
-            //客服
-            if(customerServerOnlineMap.containsKey(idSession.getClient().getSessionId().toString())){
-                chatInfo.setAccountManagerUnreadNum(0);
-                direction=SupportChatMessage.SEND_DIR;
-            }else {
-                chatInfo.setUserUnreadNum(0);
-                direction=SupportChatMessage.RECEIVE_DIR;
+            SupportChatInfo chatInfo = null;
+            //客服读取
+            if (message.getDirection().equals(SupportChatMessage.SEND_DIR)
+                    && customerServerOnlineMap.containsKey(idSession.getClient().getSessionId().toString())) {
+                chatInfo = message.getPartyId() == null ? supportChatInfoService.findByNoLoginId(message.getNoLoginId()) : supportChatInfoService.findByPartyId(message.getPartyId());
+                if (chatInfo != null)
+                    chatInfo.setAccountManagerUnreadNum(0);
+            } else if (message.getDirection().equals(SupportChatMessage.RECEIVE_DIR)) {
+                chatInfo = idSession.getPartyId() == null ? supportChatInfoService.findByNoLoginId(message.getNoLoginId()) : supportChatInfoService.findByPartyId(idSession.getPartyId());
+                if (chatInfo != null)
+                    chatInfo.setUserUnreadNum(0);
             }
-            supportChatInfoService.update(chatInfo);
 
-            //清除未读缓存
-            supportChatMessageService.readMsg(message.getNoLoginId(),message.getPartyId(),direction);
+            if (chatInfo != null) {
+                supportChatInfoService.update(chatInfo);
 
-            //发送已读确认
-            messagePusher.pushMessage(SocketIOContext.NAMESPACE, ResReadMsg.EVENTNAME,idSession.getClient().getSessionId(),new ResReadMsg());
+                //清除未读缓存
+                supportChatMessageService.readMsg(chatInfo.getNoLoginId(), chatInfo.getPartyId(), message.getDirection());
+
+                //发送已读确认
+                messagePusher.pushMessage(SocketIOContext.NAMESPACE, ResReadMsg.EVENTNAME, idSession.getClient().getSessionId(), new ResReadMsg());
+            }
+
 
         } catch (Exception e) {
             logger.error("OnlineSupportSocketClientService.read(ReqReadMsg message)消息发送失败--noLoginId:{},partyId:{}", message.getNoLoginId(), message.getPartyId());
@@ -279,17 +285,17 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
     @Override
     public void del(String msgIdStr) {
 
-        String[] ids=msgIdStr.split(",");
-        if(ids.length>0){
+        String[] ids = msgIdStr.split(",");
+        if (ids.length > 0) {
 
-            List<String> msgIds=Arrays.asList(ids);
+            List<String> msgIds = Arrays.asList(ids);
 
             //假删除消息
             supportChatMessageService.delMsg(msgIds);
 
             //通知客户和用户回撤
 
-            ResRevocationMsg msg=new ResRevocationMsg();
+            ResRevocationMsg msg = new ResRevocationMsg();
             msg.setMsgIds(msgIds);
 
             //回撤广播

@@ -29,7 +29,7 @@ public class SupportChatBlackListServiceImpl extends ServiceImpl<SupportChatBlac
 
     @Override
     public Map<String, Object> blackList(String ip, int pageIndex, int pageSize) throws Exception {
-        List<SupportChatBlackList> list=supportChatBlackListMapper.pagedQuery(ip,new Page(pageIndex,pageSize).getOffset(),pageSize);
+        List<?> list=supportChatBlackListMapper.pagedQuery1(ip,new Page(pageIndex,pageSize).getOffset(),pageSize);
         Map<String,Object> map=new HashMap<>();
         map.put("info",list);
         map.put("pageIndex",pageIndex);
