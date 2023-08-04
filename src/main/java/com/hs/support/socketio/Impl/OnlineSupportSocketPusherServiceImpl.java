@@ -44,7 +44,11 @@ public class OnlineSupportSocketPusherServiceImpl implements OnlineSupportSocket
             msg.setDirection(message.getDirection());
             msg.setCmd(message.getCmd());
             msg.setType(message.getType());
-            msg.setContent(message.getContent());
+            if (message.getType().equals(SupportChatMessage.MSG_TYPE_TEXT))
+                msg.setContent(message.getContent());
+            else if (message.getType().equals(SupportChatMessage.MSG_TYPE_IMG))
+                msg.setContent(message.getImg());
+
             msg.setSendTime(message.getCreatedTime());
 
             if(party!=null){
@@ -76,7 +80,10 @@ public class OnlineSupportSocketPusherServiceImpl implements OnlineSupportSocket
                 msg.setDirection(message.getDirection());
                 msg.setCmd(message.getCmd());
                 msg.setType(message.getType());
-                msg.setContent(message.getContent());
+                if (message.getType().equals(SupportChatMessage.MSG_TYPE_TEXT))
+                    msg.setContent(message.getContent());
+                else if (message.getType().equals(SupportChatMessage.MSG_TYPE_IMG))
+                    msg.setContent(message.getImg());
                 msg.setSendTime(message.getCreatedTime());
 
                 if(party!=null){

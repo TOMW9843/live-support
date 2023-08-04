@@ -51,7 +51,10 @@ public class OnlineSupportSocketMessageServiceImpl implements OnlineSupportSocke
         supportChatMessage.setId(new SnowFlakeUtil().nextId());
         supportChatMessage.setCmd(message.getCmd());
         supportChatMessage.setType(message.getType());
-        supportChatMessage.setContent(message.getContent());
+        if (message.getType().equals(SupportChatMessage.MSG_TYPE_TEXT))
+            supportChatMessage.setContent(message.getContent());
+        else if (message.getType().equals(SupportChatMessage.MSG_TYPE_IMG))
+            supportChatMessage.setImg(message.getContent());
         supportChatMessage.setCreatedTime(System.currentTimeMillis());
         supportChatMessage.setDirection(SupportChatMessage.RECEIVE_DIR);
         supportChatMessage.setResponder(party.getId());
@@ -101,7 +104,10 @@ public class OnlineSupportSocketMessageServiceImpl implements OnlineSupportSocke
         supportChatMessage.setId(new SnowFlakeUtil().nextId());
         supportChatMessage.setCmd(message.getCmd());
         supportChatMessage.setType(message.getType());
-        supportChatMessage.setContent(message.getContent());
+        if (message.getType().equals(SupportChatMessage.MSG_TYPE_TEXT))
+            supportChatMessage.setContent(message.getContent());
+        else if (message.getType().equals(SupportChatMessage.MSG_TYPE_IMG))
+            supportChatMessage.setImg(message.getContent());
         supportChatMessage.setCreatedTime(time);
         supportChatMessage.setDirection(SupportChatMessage.SEND_DIR);
 
@@ -153,19 +159,19 @@ public class OnlineSupportSocketMessageServiceImpl implements OnlineSupportSocke
             List<SupportChatInfoUserList> result = new ArrayList<>();
 
             for (SupportChatInfo info : chatInfos) {
-               SupportChatInfoUserList item =new SupportChatInfoUserList();
-               item.setChatId(info.getId().toString());
-               item.setAvatar(info.getAvatar());
-               item.setIp(info.getIp());
-               item.setLastMsg(info.getLastMsg());
-               item.setLastTime(info.getLastTime());
-               item.setNoLoginId(info.getNoLoginId());
-               item.setPartyId(info.getPartyId()!=null ? info.getPartyId().toString():null);
-               item.setUnReadNum(info.getAccountManagerUnreadNum());
-               item.setNickName(info.getNickName());
-               item.setRemarks(info.getRemarks());
+                SupportChatInfoUserList item = new SupportChatInfoUserList();
+                item.setChatId(info.getId().toString());
+                item.setAvatar(info.getAvatar());
+                item.setIp(info.getIp());
+                item.setLastMsg(info.getLastMsg());
+                item.setLastTime(info.getLastTime());
+                item.setNoLoginId(info.getNoLoginId());
+                item.setPartyId(info.getPartyId() != null ? info.getPartyId().toString() : null);
+                item.setUnReadNum(info.getAccountManagerUnreadNum());
+                item.setNickName(info.getNickName());
+                item.setRemarks(info.getRemarks());
 
-               result.add(item);
+                result.add(item);
             }
 
             return result;

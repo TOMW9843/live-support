@@ -17,6 +17,11 @@ public class SupportChatMessage extends EntityObject<SupportChatMessage> impleme
 
     public static final String RECEIVE_DIR="receive";
 
+    public static final String MSG_TYPE_TEXT="text";
+
+    public static final String MSG_TYPE_IMG="img";
+
+
     @TableField("party_id")
     private Long partyId;
 
@@ -43,6 +48,11 @@ public class SupportChatMessage extends EntityObject<SupportChatMessage> impleme
      * 消息
      */
     private String content;
+
+    /**
+     * 图片base64
+     */
+    private String img;
 
     /**
      * 消息方向
@@ -150,4 +160,11 @@ public class SupportChatMessage extends EntityObject<SupportChatMessage> impleme
         this.noLoginId = noLoginId;
     }
 
+    public String getImg() {
+        return img;
+    }
+
+    public void setImg(String img) {
+        this.img = img;
+    }
 }
