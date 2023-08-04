@@ -20,6 +20,7 @@ import security.token.Token;
 
 import javax.crypto.MacSpi;
 import javax.servlet.http.Part;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -288,7 +289,7 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
         String[] ids = msgIdStr.split(",");
         if (ids.length > 0) {
 
-            List<String> msgIds = Arrays.asList(ids);
+            List<String> msgIds = new ArrayList<>(Arrays.asList(ids));
 
             //假删除消息
             supportChatMessageService.delMsg(msgIds);
