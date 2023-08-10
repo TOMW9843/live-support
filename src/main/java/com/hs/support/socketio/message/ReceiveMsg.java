@@ -5,6 +5,11 @@ import java.io.Serializable;
 public class ReceiveMsg implements Serializable {
     private static final long serialVersionUID = -6879635706370459579L;
 
+    private String partyId;
+
+    private String noLoginId;
+
+    private String uid;
 
     private String msgId;
 
@@ -84,5 +89,29 @@ public class ReceiveMsg implements Serializable {
 
     public void setSendTime(Long sendTime) {
         this.sendTime = sendTime;
+    }
+
+    public String getPartyId() {
+        return partyId;
+    }
+
+    public void setPartyId(String partyId) {
+        this.partyId = partyId;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public String getNoLoginId() {
+        return noLoginId;
+    }
+
+    public void setNoLoginId(String noLoginId) {
+        this.noLoginId = noLoginId;
     }
 }

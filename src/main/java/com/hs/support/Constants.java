@@ -20,4 +20,6 @@ public class Constants {
 
     /* 客服和管理员角色 */
     public static final String CS_ROLE="customer-service_root";
+
+    public static final String USER_ROLE="user";
 }

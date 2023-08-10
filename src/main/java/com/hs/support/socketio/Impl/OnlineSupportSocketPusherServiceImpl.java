@@ -3,6 +3,7 @@ package com.hs.support.socketio.Impl;
 import com.hs.socketio.IdSession;
 import com.hs.socketio.IdSessionManager;
 import com.hs.socketio.MessagePusher;
+import com.hs.support.Constants;
 import com.hs.support.SocketIOContext;
 import com.hs.support.SupportChatInfo;
 import com.hs.support.SupportChatMessage;
@@ -17,6 +18,7 @@ import org.springframework.integration.annotation.IdempotentReceiver;
 import org.springframework.stereotype.Service;
 import party.Party;
 
+import javax.swing.text.StyleConstants;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -40,10 +42,12 @@ public class OnlineSupportSocketPusherServiceImpl implements OnlineSupportSocket
             ResReceiveMsg packet=new ResReceiveMsg();
 
             ReceiveMsg msg=new ReceiveMsg();
+            msg.setNoLoginId(message.getNoLoginId());
             msg.setMsgId(message.getId().toString());
             msg.setDirection(message.getDirection());
             msg.setCmd(message.getCmd());
             msg.setType(message.getType());
+
             if (message.getType().equals(SupportChatMessage.MSG_TYPE_TEXT))
                 msg.setContent(message.getContent());
             else if (message.getType().equals(SupportChatMessage.MSG_TYPE_IMG))
@@ -52,6 +56,10 @@ public class OnlineSupportSocketPusherServiceImpl implements OnlineSupportSocket
             msg.setSendTime(message.getCreatedTime());
 
             if(party!=null){
+                if(Constants.USER_ROLE.contains(party.getRole()))
+                    msg.setUid(party.getUsercode());
+                else
+                    msg.setPartyId(party.getId().toString());
                 msg.setNickName(party.getNickname());
                 msg.setAvatar(party.getAvatar());
             }
@@ -76,6 +84,7 @@ public class OnlineSupportSocketPusherServiceImpl implements OnlineSupportSocket
 
             for(SupportChatMessage message:supportChatMessage){
                 ReceiveMsg msg=new ReceiveMsg();
+                msg.setNoLoginId(message.getNoLoginId());
                 msg.setMsgId(message.getId().toString());
                 msg.setDirection(message.getDirection());
                 msg.setCmd(message.getCmd());
@@ -87,6 +96,10 @@ public class OnlineSupportSocketPusherServiceImpl implements OnlineSupportSocket
                 msg.setSendTime(message.getCreatedTime());
 
                 if(party!=null){
+                    if(Constants.USER_ROLE.contains(party.getRole()))
+                        msg.setUid(party.getUsercode());
+                    else
+                        msg.setPartyId(party.getId().toString());
                     msg.setNickName(party.getNickname());
                     msg.setAvatar(party.getAvatar());
                 }
