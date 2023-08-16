@@ -23,7 +23,7 @@ public class SupportInitDataHandler implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
 
-         supportChatMessageDispatcherWorkerThread.start();
+         //supportChatMessageDispatcherWorkerThread.start();
 
     }
 }
