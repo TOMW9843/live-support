@@ -22,4 +22,11 @@ public class Constants {
     public static final String CS_ROLE="customer-service_root";
 
     public static final String USER_ROLE="user";
+
+
+    /**
+     * 系统消息类型
+     */
+    public static final String SYSTEM_MSG_WELCOME="welcome";
+
 }

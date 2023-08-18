@@ -13,13 +13,24 @@ public class SupportChatMessage extends EntityObject<SupportChatMessage> impleme
 
     private static final long serialVersionUID = -4999012202564084751L;
 
+    /**
+     * 消息方向
+     */
     public static final String SEND_DIR="send";
-
     public static final String RECEIVE_DIR="receive";
 
+    /**
+     * 消息类型
+     */
     public static final String MSG_TYPE_TEXT="text";
-
     public static final String MSG_TYPE_IMG="img";
+
+
+    /**
+     * 消息级别
+     */
+    public static final String MSG_CMD_MESSAGE="message";
+    public static final String MSG_CMD_SYSTEM="system";
 
 
     @TableField("party_id")

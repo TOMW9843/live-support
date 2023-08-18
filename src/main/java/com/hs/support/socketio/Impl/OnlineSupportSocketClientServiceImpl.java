@@ -18,8 +18,6 @@ import party.PartyService;
 import security.token.SecurityTokenService;
 import security.token.Token;
 
-import javax.crypto.MacSpi;
-import javax.servlet.http.Part;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -68,8 +66,9 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
     @Override
     public void connect(ConnectMessage message) {
         IdSession idSession = idSessionManager.getSession(SocketIOContext.NAMESPACE, message.getClient().getSessionId());
+        Party party = null;
         if (idSession.getPartyId() != null) {
-            Party party = partyService.get(idSession.getPartyId());
+            party = partyService.get(idSession.getPartyId());
             /**
              * 如果是客服
              */
@@ -98,6 +97,10 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
             }
 
         }
+
+        //发送欢迎消息
+        sendSystemMessage(idSession, party, Constants.SYSTEM_MSG_WELCOME);
+
 
     }
 
@@ -304,6 +307,52 @@ public class OnlineSupportSocketClientServiceImpl implements OnlineSupportSocket
 
         }
 
+    }
+
+    /**
+     * 发送系统消息
+     *
+     * @param idSession 会话id
+     * @param party     方
+     */
+    private void sendSystemMessage(IdSession idSession, Party party, String msgType) {
+
+        try {
+            //如果是客服不发送
+            if (party != null && Constants.CS_ROLE.contains(party.getRole())) {
+                return;
+            }
+
+            SupportChatInfo chatInfo = idSession.getPartyId() == null ? supportChatInfoService.findByNoLoginId(idSession.getNoLoginId()) : supportChatInfoService.findByPartyId(idSession.getPartyId());
+            if (chatInfo == null) {
+                String ip = idSession.getClient().getHandshakeData().getAddress().getAddress().getHostAddress();
+                chatInfo = onlineSupportSocketMessageService.systemCreateChatInfo(idSession.getPartyId(), idSession.getNoLoginId(), ip);
+            }
+
+            if (chatInfo == null) {
+                return;
+            }
+
+            SupportChatMessage chatMsg = onlineSupportSocketMessageService.createSystemChatMessage(idSession, party, msgType);
+            if (chatMsg == null) {
+                return;
+            }
+
+            chatInfo.setUserUnreadNum(chatInfo.getUserUnreadNum() + 1);
+            chatInfo.setLastMsg(chatMsg.getContent());
+            chatInfo.setLastTime(chatMsg.getCreatedTime());
+            chatInfo.setLastResponder(idSession.getPartyId());
+            supportChatInfoService.update(chatInfo);
+
+
+            onlineSupportSocketPusherService.supportReceiveMessage(chatMsg, idSession, party);
+
+
+        } catch (Exception e) {
+            logger.error("OnlineSupportSocketClientService.sendSystemMessage(ReqSendMsg message)消息发送失败--noLoginId:{},partyId:{}", idSession.getNoLoginId(), idSession.getPartyId());
+            logger.error("OnlineSupportSocketClientService.sendSystemMessage(ReqSendMsg message)消息发送失败--error:{},trace:{}", e.getMessage(), Arrays.toString(e.getStackTrace()));
+            //messagePusher.pushMessage(SocketIOContext.NAMESPACE, ResReceiveMsg.EVENTNAME, idSession.getClient().getSessionId(), new ResReceiveMsg("500", "消息发送失败"));
+        }
     }
 
 

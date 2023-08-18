@@ -1,6 +1,7 @@
 package com.hs.support.socketio;
 
 import com.hs.socketio.IdSession;
+import com.hs.support.SupportChatInfo;
 import com.hs.support.SupportChatMessage;
 import com.hs.support.model.SupportChatInfoUserList;
 import com.hs.support.socketio.message.ReqSendMsg;
@@ -33,12 +34,24 @@ public interface OnlineSupportSocketMessageService {
 
 
     /**
+     * 创建系统消息
+     *
+     * @param idSession 没有登录id
+     * @param party     方
+     * @return {@link SupportChatMessage}
+     */
+    SupportChatMessage createSystemChatMessage(IdSession idSession, Party party,String msgType);
+
+
+    /**
      * 客服创建聊天消息
      *
      * @param partyId 方id
      */
-    void createChatInfo(Long partyId) throws Exception;
+    void customerServiceCreateChatInfo(Long partyId) throws Exception;
 
+
+    SupportChatInfo systemCreateChatInfo(Long partyId, String noLoginId, String ip);
 
     /**
      * 用户列表
