@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="module.support.mapper.SupportMessageMapper">
+
+    <select id="pagedQuery" resultType="module.support.model.Message">
+        select *
+        from support_message
+        where deleted = 0
+        <if test="lastTime != null and lastTime != '' ">
+            and created_time BETWEEN 0 AND #{lastTime}
+        </if>
+          <choose>
+            <when test="partyId !=null">
+                and party_id=#{partyId}
+            </when>
+            <otherwise>
+                and no_login_id=#{noLoginId}
+            </otherwise>
+        </choose>
+        order by created_time DESC
+        limit #{pageSize}
+    </select>
+
+</mapper>
