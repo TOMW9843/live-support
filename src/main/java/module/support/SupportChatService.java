@@ -26,6 +26,8 @@ public interface SupportChatService {
      */
     List<Chat> pagedQuery(Long lastTime,Integer pageSize);
 
+    List<Chat> pagedQuery(String params);
+
     /**
      * 所有黑名单记录
      */

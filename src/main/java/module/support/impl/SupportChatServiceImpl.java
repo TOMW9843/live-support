@@ -78,6 +78,11 @@ public class SupportChatServiceImpl extends ServiceImpl<SupportChatMapper, Chat>
     }
 
     @Override
+    public List<Chat> pagedQuery(String params) {
+        return supportChatMapper.pagedQuery(params);
+    }
+
+    @Override
     public List<Chat> blacklist() {
         LambdaQueryWrapper<Chat> ew = new LambdaQueryWrapper<>();
         ew.eq(Chat::getBlacklist, true);
