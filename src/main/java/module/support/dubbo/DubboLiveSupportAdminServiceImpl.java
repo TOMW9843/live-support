@@ -2,6 +2,7 @@ package module.support.dubbo;
 
 import module.support.LiveSupportAdminService;
 import module.support.LiveSupportApiService;
+import module.support.model.Chat;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -13,8 +14,8 @@ public class DubboLiveSupportAdminServiceImpl implements DubboLiveSupportAdminSe
     @Autowired
     private LiveSupportAdminService liveSupportAdminService;
     @Override
-    public void create(Long partyId) {
-        liveSupportAdminService.create(partyId);
+    public Chat create(Long partyId) {
+       return liveSupportAdminService.create(partyId);
     }
 
     @Override

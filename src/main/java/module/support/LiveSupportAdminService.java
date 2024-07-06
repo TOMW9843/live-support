@@ -1,6 +1,7 @@
 package module.support;
 
 import module.socketio.IdSession;
+import module.support.model.Chat;
 
 import java.util.List;
 
@@ -34,7 +35,7 @@ public interface LiveSupportAdminService {
     /**
      * 创建用户对话
      */
-    void create(Long partyId);
+    Chat create(Long partyId);
 
     /**
      * 已读回执

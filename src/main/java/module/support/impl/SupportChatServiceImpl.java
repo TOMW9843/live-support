@@ -43,6 +43,7 @@ public class SupportChatServiceImpl extends ServiceImpl<SupportChatMapper, Chat>
     public void modify(Chat entity) {
         this.updateById(entity);
 
+
     }
 
     @Override

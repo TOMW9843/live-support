@@ -118,7 +118,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
 
     @Override
     @Transactional
-    public void create(Long partyId) {
+    public Chat create(Long partyId) {
         Chat chat = supportChatService.findBy(partyId, null);
         if (chat == null) {
             chat = new Chat();
@@ -133,6 +133,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         List<Chat> chatList = new ArrayList<>();
         chatList.add(chat);
         liveSupportAdminPusherService.user(chatList);
+        return chat;
     }
 
 

@@ -1,11 +1,13 @@
 package module.support.dubbo;
 
+import module.support.model.Chat;
+
 public interface DubboLiveSupportAdminService {
 
     /**
      * 创建用户对话
      */
-    void create(Long partyId);
+    Chat create(Long partyId);
 
 
     /**
