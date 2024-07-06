@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 
 import module.party.Party;
 import module.party.PartyService;
+import module.redis.RedisService;
+import module.support.Constants;
 import module.support.model.Chat;
 import module.support.SupportChatService;
 import module.support.mapper.SupportChatMapper;
@@ -28,6 +30,9 @@ public class SupportChatServiceImpl extends ServiceImpl<SupportChatMapper, Chat>
     @Autowired
     PartyService partyService;
 
+    @Autowired
+    RedisService redisService;
+
     @Override
     public void insert(Chat entity) {
         if (entity.getPartyId()!=null){
@@ -42,8 +47,11 @@ public class SupportChatServiceImpl extends ServiceImpl<SupportChatMapper, Chat>
     @Override
     public void modify(Chat entity) {
         this.updateById(entity);
-
-
+        if (entity.getSupporterUnread()>0){
+            redisService.hset(Constants.redis_support_chat,entity.getPartyId().toString(),entity);
+        }else{
+            redisService.hdel(Constants.redis_support_chat,entity.getPartyId().toString());
+        }
     }
 
     @Override

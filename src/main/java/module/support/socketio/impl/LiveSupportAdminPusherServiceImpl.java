@@ -57,7 +57,7 @@ public class LiveSupportAdminPusherServiceImpl implements LiveSupportAdminPusher
         for (int i = 0; i < entityList.size(); i++) {
             Message message = entityList.get(i);
             Map<String, Object> item = new HashMap<>();
-            item.put("chatid", message.getChatid());
+            item.put("chatid", message.getChatid().toString());
             item.put("msgid", message.getId().toString());
             item.put("direction", message.getDirection());
             item.put("type", message.getType());
