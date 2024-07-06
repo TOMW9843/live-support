@@ -130,7 +130,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
     @Override
     public Long read(Long partyId, String noLoginId) {
         Chat chat = supportChatService.findBy(partyId, noLoginId);
-        if (chat==null || chat.getUserUnread()<=0){
+        if (chat==null){
             return System.currentTimeMillis();
         }
 

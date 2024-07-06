@@ -17,6 +17,7 @@ import java.util.Map;
 
 @Service
 public class LiveSupportApiPusherServiceImpl implements LiveSupportApiPusherService {
+
     @Autowired
     private MessagePusher messagePusher;
     @Override
@@ -43,9 +44,9 @@ public class LiveSupportApiPusherServiceImpl implements LiveSupportApiPusherServ
 
     @Override
     public void delmsg(IdSession session, List<Long> msgIds) {
+
         Map<String, Object> data = new HashMap<>();
         data.put("msgids",msgIds);
-
         ResDefault packet = new ResDefault();
         packet.setData(data);
         messagePusher.pushMessage(LiveSupportMessageEventHandler.NAMESPACE, "delmsg",session.getClient().getSessionId(), packet);

@@ -104,16 +104,16 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
     @Override
     public Long read(Long chatid) {
         Chat chat = supportChatService.findBy(chatid);
-        if (chat == null || chat.getUserUnread() <= 0) {
+        if (chat == null) {
             return System.currentTimeMillis();
         }
-        if (chat.getUserUnread() <= 0) {
-            return chat.getUserReadTime();
+        if (chat.getSupporterUnread() <= 0) {
+            return chat.getSupporterReadTime();
         }
-        chat.setUserUnread(0);
-        chat.setUserReadTime(System.currentTimeMillis());
+        chat.setSupporterUnread(0);
+        chat.setSupporterReadTime(System.currentTimeMillis());
         supportChatService.modify(chat);
-        return chat.getUserReadTime();
+        return chat.getSupporterReadTime();
     }
 
     @Override
