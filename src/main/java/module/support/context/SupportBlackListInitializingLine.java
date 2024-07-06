@@ -30,6 +30,7 @@ public class SupportBlackListInitializingLine implements InitializingLine {
     public void init() {
         //清除缓存
         redisService.del(Constants.redis_support_blacklist);
+        redisService.del(Constants.redis_support_chat);
         loadingToRedis();
         if (logger.isInfoEnabled()) {
             logger.info("[ live-support ]redis缓存[ 加载完成 ]");
@@ -53,6 +54,13 @@ public class SupportBlackListInitializingLine implements InitializingLine {
 
             }
             redisService.hmset(Constants.redis_support_blacklist,map);
+
+
+        List<Chat> unread =  supportChatService.unread();
+        for (int i = 0; i < unread.size(); i++) {
+            Chat chat=unread.get(i);
+            redisService.hset(Constants.redis_support_chat,chat.getPartyId().toString(),chat);
+        }
 
     }
 }

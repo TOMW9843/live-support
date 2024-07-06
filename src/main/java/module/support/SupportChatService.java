@@ -29,6 +29,11 @@ public interface SupportChatService {
     List<Chat> pagedQuery(String params);
 
     /**
+     * 所有客服未读记录
+     */
+    List<Chat> unread();
+
+    /**
      * 所有黑名单记录
      */
     List<Chat> blacklist();

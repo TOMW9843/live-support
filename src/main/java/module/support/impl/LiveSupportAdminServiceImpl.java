@@ -184,6 +184,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
     public void addBlacklist(Long chatId) {
         Chat chat = supportChatService.findBy(chatId);
         chat.setBlacklist(true);
+        supportChatService.modify(chat);
         if (chat.getPartyId()!=null){
             redisService.hset(Constants.redis_support_blacklist,chat.getPartyId().toString(),chat.getPartyId().toString());
         }
@@ -204,6 +205,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
     public void deleteBlacklist(Long chatId) {
         Chat chat = supportChatService.findBy(chatId);
         chat.setBlacklist(false);
+        supportChatService.modify(chat);
         if (chat.getPartyId()!=null){
             redisService.hdel(Constants.redis_support_blacklist,chat.getPartyId().toString());
         }

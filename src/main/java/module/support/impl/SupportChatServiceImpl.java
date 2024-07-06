@@ -92,6 +92,13 @@ public class SupportChatServiceImpl extends ServiceImpl<SupportChatMapper, Chat>
     }
 
     @Override
+    public List<Chat> unread() {
+        LambdaQueryWrapper<Chat> ew = new LambdaQueryWrapper<>();
+        ew.ge(Chat::getSupporterUnread, 0);
+        return this.list();
+    }
+
+    @Override
     public List<Chat> blacklist() {
         LambdaQueryWrapper<Chat> ew = new LambdaQueryWrapper<>();
         ew.eq(Chat::getBlacklist, true);
