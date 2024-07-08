@@ -68,7 +68,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         /**
          * 更新Chat
          */
-        chat.setSupporterUnread(chat.getSupporterUnread() + 1);
+        chat.setUserUnread(chat.getUserUnread()+1);
         if (Message.MSG_TYPE_TEXT.equals(type)) {
             chat.setLastmsg(content);
         }
@@ -86,6 +86,8 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         List<Message> messageList = new ArrayList<>();
         messageList.add(message);
         liveSupportAdminPusherService.receive(messageList);
+
+
         //api
         IdSession idSession = null;
         if (chat.getPartyId() != null) {
@@ -96,7 +98,10 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
             idSession = idSessionManager.getSession(LiveSupportMessageEventHandler.NAMESPACE, chat.getNoLoginId());
 
         }
-        liveSupportApiPusherService.receive(idSession, messageList);
+        if (idSession!=null){
+            liveSupportApiPusherService.receive(idSession, messageList);
+        }
+
 
 
     }
