@@ -1,6 +1,10 @@
 package module.support.impl;
 
 
+import module.message.model.AdminMessage;
+import module.message.model.ApiMessage;
+import module.message.socketio.MessageAdminPusherService;
+import module.message.socketio.MessageApiPusherService;
 import module.redis.RedisService;
 import module.socketio.IdSession;
 import module.support.Constants;
@@ -19,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class LiveSupportApiServiceImpl implements LiveSupportApiService {
@@ -37,6 +42,12 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
 
     @Autowired
     RedisService redisService;
+
+    @Autowired
+    private MessageAdminPusherService messageAdminPusherService;
+
+    @Autowired
+    private MessageApiPusherService messageApiPusherService;
 
 
     @Override
@@ -96,7 +107,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         message.setChatid(chat.getId());
         message.setPartyId(session.getPartyId());
         message.setNoLoginId(session.getNoLoginId());
-        message.setDirection(Message.SEND_DIR);
+        message.setDirection(Message.SEND);
         message.setType(type);
         message.setContent(content);
         message.setCreatedTime(System.currentTimeMillis());
@@ -119,12 +130,34 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         List<Chat> chatList=new ArrayList<>();
         chatList.add(chat);
         liveSupportAdminPusherService.user(chatList);
-
         List<Message> messageList = new ArrayList<>();
         messageList.add(message);
         liveSupportAdminPusherService.receive(messageList);
+
+        //事件通知
+        liveSupportAdminPusherService.message(messageList);
+        /**
+         * 消息脚标更新
+         */
+        AdminMessage adminMessage=new AdminMessage();
+        adminMessage.setChannel(AdminMessage.channel_support);
+        adminMessage.setType(AdminMessage.type_update);
+        /**
+         * 未回复客服消息
+         */
+        Map<Object, Object> chatmap = redisService.hmget(Constants.redis_support_chat);
+        int num = 0;
+        for (Object value : chatmap.values()) {
+            num = num + ((Chat) value).getSupporterUnread();
+        }
+        adminMessage.setNum(num);
+        messageAdminPusherService.receive(adminMessage);
+
         //api
         liveSupportApiPusherService.receive(session, messageList);
+
+
+
     }
 
     @Override
@@ -140,6 +173,13 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         chat.setUserUnread(0);
         chat.setUserReadTime(System.currentTimeMillis());
         supportChatService.modify(chat);
+
+        ApiMessage message=new ApiMessage();
+        message.setPartyId(partyId);
+        message.setNoLoginId(noLoginId);
+        message.setChannel(ApiMessage.channel_support);
+        message.setNum(chat.getUserUnread());
+        messageApiPusherService.receive(null,message);
 
         return chat.getUserReadTime();
 

@@ -16,8 +16,8 @@ public class Message extends EntityObject<Message> implements Comparable<Message
     /**
      * 消息方向
      */
-    public static final String SEND_DIR="send";
-    public static final String RECEIVE_DIR="receive";
+    public static final String SEND ="send";
+    public static final String RECEIVE ="receive";
 
     /**
      * 消息类型
@@ -137,4 +137,5 @@ public class Message extends EntityObject<Message> implements Comparable<Message
     public void setChatid(Long chatid) {
         this.chatid = chatid;
     }
+
 }

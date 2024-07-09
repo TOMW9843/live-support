@@ -1,6 +1,8 @@
 package module.support.socketio.impl;
 
+import module.redis.RedisService;
 import module.socketio.support.ResDefault;
+import module.support.Constants;
 import module.support.model.Chat;
 import module.support.model.Message;
 import module.support.socketio.LiveSupportAdminPusherService;
@@ -19,6 +21,9 @@ import java.util.Map;
 public class LiveSupportAdminPusherServiceImpl implements LiveSupportAdminPusherService {
     @Autowired
     private MessagePusher messagePusher;
+
+    @Autowired
+    private RedisService redisService;
 
     @Override
     public void user(List<Chat> entityList) {
@@ -39,6 +44,7 @@ public class LiveSupportAdminPusherServiceImpl implements LiveSupportAdminPusher
             item.put("lasttime", chat.getLastTime());
             item.put("readtime", chat.getSupporterReadTime());
             item.put("blacklist", chat.getBlacklist());
+            item.put("remarks", chat.getRemarks());
             data.add(item);
         }
 
@@ -71,6 +77,17 @@ public class LiveSupportAdminPusherServiceImpl implements LiveSupportAdminPusher
         ResDefault packet = new ResDefault();
         packet.setData(data);
         messagePusher.pushMessage(LiveSupportMessageEventHandler.NAMESPACE, "receive", packet);
+    }
+
+    @Override
+    public void  message(List<Message> entityList) {
+        Map<String, Object> map = new HashMap<String, Object>();
+        for (int i = 0; i < entityList.size(); i++) {
+            Message message=entityList.get(i);
+            map.put(message.getId().toString(),message);
+        }
+        redisService.hmset(Constants.redis_support_delay,map);
+
     }
 
     @Override

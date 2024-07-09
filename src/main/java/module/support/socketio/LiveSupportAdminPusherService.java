@@ -21,6 +21,11 @@ public interface LiveSupportAdminPusherService {
     public void receive(List<Message> entityList);
 
     /**
+     * 消息延后推送
+     */
+    public void  message(List<Message> entityList);
+
+    /**
      * 消息撤回
      */
     public void delmsg(Long chatId,List<Long> msgIds);

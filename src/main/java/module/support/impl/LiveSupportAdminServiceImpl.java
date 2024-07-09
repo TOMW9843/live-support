@@ -1,5 +1,9 @@
 package module.support.impl;
 
+import module.message.model.AdminMessage;
+import module.message.model.ApiMessage;
+import module.message.socketio.MessageAdminPusherService;
+import module.message.socketio.MessageApiPusherService;
 import module.redis.RedisService;
 import module.socketio.IdSession;
 import module.socketio.IdSessionManager;
@@ -19,7 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
@@ -40,6 +46,14 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
     @Autowired
     RedisService redisService;
 
+    @Autowired
+    MessageApiPusherService messageApiPusherService;
+
+    @Autowired
+    private MessageAdminPusherService messageAdminPusherService;
+
+
+
     @Override
     public void connect(IdSession session) {
         List<Chat> entityList = supportChatService.pagedQuery(System.currentTimeMillis(), 50);
@@ -59,7 +73,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         message.setChatid(chat.getId());
         message.setPartyId(chat.getPartyId());
         message.setNoLoginId(chat.getNoLoginId());
-        message.setDirection(Message.RECEIVE_DIR);
+        message.setDirection(Message.RECEIVE);
         message.setType(type);
         message.setContent(content);
         message.setCreatedTime(System.currentTimeMillis());
@@ -100,6 +114,14 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         }
         if (idSession!=null){
             liveSupportApiPusherService.receive(idSession, messageList);
+
+            /**
+             * API端脚标通知
+             */
+            ApiMessage apiMessage=new ApiMessage();
+            apiMessage.setChannel(ApiMessage.channel_support);
+            apiMessage.setNum(chat.getUserUnread());
+            messageApiPusherService.receive(idSession,apiMessage);
         }
 
 
@@ -118,6 +140,40 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         chat.setSupporterUnread(0);
         chat.setSupporterReadTime(System.currentTimeMillis());
         supportChatService.modify(chat);
+
+
+        Map<Object, Object> map = redisService.hmget(Constants.redis_support_delay);
+        List<String> cancel=new ArrayList<>();
+        Iterator<Map.Entry<Object, Object>> it = map.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<Object, Object> entry = it.next();
+            Message message=   (Message)entry.getValue();
+            if (message.getChatid().equals(chatid)){
+                cancel.add(String.valueOf(message.getId()));
+            }
+        }
+        if (cancel.size()>0){
+            redisService.hdel(Constants.redis_support_delay,(String[])cancel.toArray());
+        }
+
+        /**
+         * 消息脚标更新
+         */
+        AdminMessage adminMessage=new AdminMessage();
+        adminMessage.setChannel(AdminMessage.channel_support);
+        adminMessage.setType(AdminMessage.type_update);
+        /**
+         * 未回复客服消息
+         */
+        Map<Object, Object> chatmap = redisService.hmget(Constants.redis_support_chat);
+        int num = 0;
+        for (Object value : chatmap.values()) {
+            num = num + ((Chat) value).getSupporterUnread();
+        }
+        adminMessage.setNum(num);
+        messageAdminPusherService.receive(adminMessage);
+
+
         return chat.getSupporterReadTime();
     }
 
