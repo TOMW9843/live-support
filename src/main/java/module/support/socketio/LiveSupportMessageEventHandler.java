@@ -8,6 +8,8 @@ import com.corundumstudio.socketio.annotation.OnConnect;
 import com.corundumstudio.socketio.annotation.OnDisconnect;
 import com.corundumstudio.socketio.annotation.OnEvent;
 
+import common.exception.BusinessException;
+import common.web.CodeEnum;
 import module.security.ResourceMatcher;
 import module.security.interceptor.Authorization;
 import module.security.token.SecurityTokenService;
@@ -56,7 +58,7 @@ public class LiveSupportMessageEventHandler extends MessageEventHandler {
     @OnConnect
     public void onConnect(SocketIOClient client) {
         IdSession session = new IdSession(client);
-        String auth = client.getHandshakeData().getHttpHeaders().get("auth");
+        String auth = session.getToken();
         if (!StringUtils.isEmpty(auth)) {
             Token token = securityTokenService.find(auth);
             if (token != null) {
@@ -73,7 +75,11 @@ public class LiveSupportMessageEventHandler extends MessageEventHandler {
                 if (match.get("601") == 1) {
                     idSessionManager.addSession(NAMESPACE, client.getSessionId(), session);
                     liveSupportAdminService.connect(session);
+                }else{
+                    throw new BusinessException(CodeEnum.NO_PERMISSION.getCode(),CodeEnum.NO_PERMISSION.getMessage());
                 }
+            }else{
+                throw new BusinessException(CodeEnum.NOT_LOGGED_IN.getCode(),CodeEnum.NOT_LOGGED_IN.getMessage());
             }
         }
     }

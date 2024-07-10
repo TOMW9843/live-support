@@ -17,6 +17,7 @@ import module.support.model.Message;
 import module.support.socketio.LiveSupportAdminPusherService;
 import module.support.socketio.LiveSupportApiPusherService;
 import module.support.socketio.LiveSupportMessageEventHandler;
+import module.support.socketio.SupportMessageEventHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -105,11 +106,11 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         //api
         IdSession idSession = null;
         if (chat.getPartyId() != null) {
-            idSession = idSessionManager.getSession(LiveSupportMessageEventHandler.NAMESPACE, chat.getPartyId());
+            idSession = idSessionManager.getSession(SupportMessageEventHandler.NAMESPACE, chat.getPartyId());
         }
 
         if (idSession == null) {
-            idSession = idSessionManager.getSession(LiveSupportMessageEventHandler.NAMESPACE, chat.getNoLoginId());
+            idSession = idSessionManager.getSession(SupportMessageEventHandler.NAMESPACE, chat.getNoLoginId());
 
         }
         if (idSession!=null){
