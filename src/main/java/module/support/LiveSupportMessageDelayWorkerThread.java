@@ -4,7 +4,7 @@ import common.util.DateTimeUtil;
 import common.util.ThreadUtils;
 import framework.context.WorkerThread;
 import module.message.model.AdminMessage;
-import module.message.socketio.MessageAdminPusherService;
+import module.message.MessageAdminPusherService;
 import module.redis.RedisService;
 import module.support.model.Chat;
 import module.support.model.Message;

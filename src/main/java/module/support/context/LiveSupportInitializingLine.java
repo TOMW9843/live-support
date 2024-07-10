@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class SupportBlackListInitializingLine implements InitializingLine {
+public class LiveSupportInitializingLine implements InitializingLine {
 
-    private final Logger logger = LoggerFactory.getLogger(SupportBlackListInitializingLine.class);
+    private final Logger logger = LoggerFactory.getLogger(LiveSupportInitializingLine.class);
 
     @Autowired
     RedisService redisService;
@@ -45,21 +45,25 @@ public class SupportBlackListInitializingLine implements InitializingLine {
             Map<String, Object> map = new HashMap<String, Object>();
             for (int i = 0; i < list.size(); i++) {
                 Chat chat=list.get(i);
-                if (chat.getPartyId()!=null){
-                    map.put(chat.getPartyId().toString(), chat.getPartyId().toString());
+                if (chat.getBlacklist()){
+                    if (chat.getPartyId()!=null){
+                        map.put(chat.getPartyId().toString(), chat.getPartyId().toString());
+                    }
+                    if (!StringUtils.isEmpty(chat.getNoLoginId())){
+                        map.put(chat.getNoLoginId(),chat.getNoLoginId());
+                    }
                 }
-                if (!StringUtils.isEmpty(chat.getNoLoginId())){
-                    map.put(chat.getNoLoginId(),chat.getNoLoginId());
-                }
-
             }
-            redisService.hmset(Constants.redis_support_blacklist,map);
+            if (map.size()>0){
+                redisService.hmset(Constants.redis_support_blacklist,map);
+            }
+
 
 
         List<Chat> unread =  supportChatService.unread();
         for (int i = 0; i < unread.size(); i++) {
             Chat chat=unread.get(i);
-            redisService.hset(Constants.redis_support_chat,chat.getPartyId().toString(),chat);
+            redisService.hset(Constants.redis_support_chat,chat.getId().toString(),chat);
         }
 
     }

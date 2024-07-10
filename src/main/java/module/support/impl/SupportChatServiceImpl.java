@@ -48,9 +48,9 @@ public class SupportChatServiceImpl extends ServiceImpl<SupportChatMapper, Chat>
     public void modify(Chat entity) {
         this.updateById(entity);
         if (entity.getSupporterUnread()>0){
-            redisService.hset(Constants.redis_support_chat,entity.getPartyId().toString(),entity);
+            redisService.hset(Constants.redis_support_chat,entity.getId().toString(),entity);
         }else{
-            redisService.hdel(Constants.redis_support_chat,entity.getPartyId().toString());
+            redisService.hdel(Constants.redis_support_chat,entity.getId().toString());
         }
     }
 
