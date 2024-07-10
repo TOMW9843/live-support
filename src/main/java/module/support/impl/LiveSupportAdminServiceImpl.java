@@ -154,6 +154,10 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
             }
         }
         if (cancel.size()>0){
+            String[] ids=cancel.toArray(new String[0]);
+            for (int i = 0; i < cancel.size(); i++) {
+
+            }
             redisService.hdel(Constants.redis_support_delay,(String[])cancel.toArray());
         }
 
