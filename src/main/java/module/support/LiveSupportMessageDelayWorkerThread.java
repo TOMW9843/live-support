@@ -72,7 +72,7 @@ public class LiveSupportMessageDelayWorkerThread implements WorkerThread, Runnab
                     messagePusherService.admin(adminMessage);
 
                 }
-                redisService.hdel(Constants.redis_support_delay);
+                redisService.del(Constants.redis_support_delay);
 
 
             } catch (Throwable t) {
