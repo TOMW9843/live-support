@@ -3,8 +3,7 @@ package module.support.impl;
 
 import module.message.model.AdminMessage;
 import module.message.model.ApiMessage;
-import module.message.MessageAdminPusherService;
-import module.message.MessageApiPusherService;
+import module.message.MessagePusherService;
 import module.redis.RedisService;
 import module.socketio.IdSession;
 import module.support.Constants;
@@ -12,7 +11,6 @@ import module.support.LiveSupportApiService;
 import module.support.SupportChatService;
 import module.support.SupportMessageService;
 import module.support.model.Chat;
-import module.support.model.Message;
 
 import module.support.socketio.LiveSupportAdminPusherService;
 import module.support.socketio.LiveSupportApiPusherService;
@@ -44,10 +42,10 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
     RedisService redisService;
 
     @Autowired
-    private MessageAdminPusherService messageAdminPusherService;
+    private MessagePusherService messageAdminPusherService;
 
     @Autowired
-    private MessageApiPusherService messageApiPusherService;
+    private MessagePusherService messagePusherService;
 
 
     @Override
@@ -59,7 +57,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         if (chat==null || chat.getUserUnread() <= 0){
             return;
         }
-      List<Message> entityList= supportMessageService.pagedQuery(session.getPartyId(),session.getNoLoginId(),chat.getUserReadTime(),chat.getUserUnread()+20);
+      List<module.support.model.Message> entityList= supportMessageService.pagedQuery(session.getPartyId(),session.getNoLoginId(),chat.getUserReadTime(),chat.getUserUnread()+20);
         if (entityList.size()>0){
             /**
              * api端推送
@@ -103,11 +101,11 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         /**
          * 保存消息记录
          */
-        Message message= new Message();
+        module.support.model.Message message= new module.support.model.Message();
         message.setChatid(chat.getId());
         message.setPartyId(session.getPartyId());
         message.setNoLoginId(session.getNoLoginId());
-        message.setDirection(Message.SEND);
+        message.setDirection(module.support.model.Message.SEND);
         message.setType(type);
         message.setContent(content);
         message.setCreatedTime(System.currentTimeMillis());
@@ -117,7 +115,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
          * 更新Chat
          */
         chat.setSupporterUnread(chat.getSupporterUnread()+1);
-        if (Message.MSG_TYPE_TEXT.equals(type)){
+        if (module.support.model.Message.MSG_TYPE_TEXT.equals(type)){
             chat.setLastmsg(content);
         }
         chat.setLastTime(System.currentTimeMillis());
@@ -130,7 +128,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         List<Chat> chatList=new ArrayList<>();
         chatList.add(chat);
         liveSupportAdminPusherService.user(chatList);
-        List<Message> messageList = new ArrayList<>();
+        List<module.support.model.Message> messageList = new ArrayList<>();
         messageList.add(message);
         liveSupportAdminPusherService.receive(messageList);
 
@@ -151,7 +149,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
             num = num + ((Chat) value).getSupporterUnread();
         }
         adminMessage.setNum(num);
-        messageAdminPusherService.receive(adminMessage);
+        messagePusherService.admin(adminMessage);
 
         //api
         liveSupportApiPusherService.receive(session, messageList);
@@ -179,7 +177,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         message.setNoLoginId(noLoginId);
         message.setChannel(ApiMessage.channel_support);
         message.setNum(chat.getUserUnread());
-        messageApiPusherService.receive(null,message);
+        messagePusherService.api(null,message);
 
         return chat.getUserReadTime();
 

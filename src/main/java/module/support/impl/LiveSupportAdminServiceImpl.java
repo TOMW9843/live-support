@@ -2,8 +2,7 @@ package module.support.impl;
 
 import module.message.model.AdminMessage;
 import module.message.model.ApiMessage;
-import module.message.MessageAdminPusherService;
-import module.message.MessageApiPusherService;
+import module.message.MessagePusherService;
 import module.redis.RedisService;
 import module.socketio.IdSession;
 import module.socketio.IdSessionManager;
@@ -13,7 +12,6 @@ import module.support.LiveSupportAdminService;
 import module.support.SupportChatService;
 import module.support.SupportMessageService;
 import module.support.model.Chat;
-import module.support.model.Message;
 import module.support.socketio.LiveSupportAdminPusherService;
 import module.support.socketio.LiveSupportApiPusherService;
 import module.support.socketio.LiveSupportMessageEventHandler;
@@ -48,10 +46,10 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
     RedisService redisService;
 
     @Autowired
-    MessageApiPusherService messageApiPusherService;
+    MessagePusherService messagePusherService;
 
     @Autowired
-    private MessageAdminPusherService messageAdminPusherService;
+    private MessagePusherService messageAdminPusherService;
 
 
 
@@ -70,11 +68,11 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         /**
          * 保存消息记录
          */
-        Message message = new Message();
+        module.support.model.Message message = new module.support.model.Message();
         message.setChatid(chat.getId());
         message.setPartyId(chat.getPartyId());
         message.setNoLoginId(chat.getNoLoginId());
-        message.setDirection(Message.RECEIVE);
+        message.setDirection(module.support.model.Message.RECEIVE);
         message.setType(type);
         message.setContent(content);
         message.setCreatedTime(System.currentTimeMillis());
@@ -84,7 +82,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
          * 更新Chat
          */
         chat.setUserUnread(chat.getUserUnread()+1);
-        if (Message.MSG_TYPE_TEXT.equals(type)) {
+        if (module.support.model.Message.MSG_TYPE_TEXT.equals(type)) {
             chat.setLastmsg(content);
         }
         chat.setLastTime(System.currentTimeMillis());
@@ -98,7 +96,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         chatList.add(chat);
         liveSupportAdminPusherService.user(chatList);
 
-        List<Message> messageList = new ArrayList<>();
+        List<module.support.model.Message> messageList = new ArrayList<>();
         messageList.add(message);
         liveSupportAdminPusherService.receive(messageList);
 
@@ -115,16 +113,16 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         }
         if (idSession!=null){
             liveSupportApiPusherService.receive(idSession, messageList);
-
-            /**
-             * API端脚标通知
-             */
-            ApiMessage apiMessage=new ApiMessage();
-            apiMessage.setChannel(ApiMessage.channel_support);
-            apiMessage.setNum(chat.getUserUnread());
-            messageApiPusherService.receive(idSession,apiMessage);
         }
-
+        /**
+         * API端脚标通知
+         */
+        ApiMessage apiMessage=new ApiMessage();
+        apiMessage.setChannel(ApiMessage.channel_support);
+        apiMessage.setNum(chat.getUserUnread());
+        apiMessage.setPartyId(chat.getPartyId());
+        apiMessage.setNoLoginId(chat.getNoLoginId());
+        messagePusherService.api(null,apiMessage);
 
 
     }
@@ -148,7 +146,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         Iterator<Map.Entry<Object, Object>> it = map.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<Object, Object> entry = it.next();
-            Message message=   (Message)entry.getValue();
+            module.support.model.Message message=   (module.support.model.Message)entry.getValue();
             if (message.getChatid().equals(chatid)){
                 cancel.add(String.valueOf(message.getId()));
             }
@@ -176,7 +174,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
             num = num + ((Chat) value).getSupporterUnread();
         }
         adminMessage.setNum(num);
-        messageAdminPusherService.receive(adminMessage);
+        messagePusherService.admin(adminMessage);
 
 
         return chat.getSupporterReadTime();

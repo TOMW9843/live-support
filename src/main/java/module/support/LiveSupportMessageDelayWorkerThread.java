@@ -3,11 +3,10 @@ package module.support;
 import common.util.DateTimeUtil;
 import common.util.ThreadUtils;
 import framework.context.WorkerThread;
+import module.message.MessagePusherService;
 import module.message.model.AdminMessage;
-import module.message.MessageAdminPusherService;
 import module.redis.RedisService;
 import module.support.model.Chat;
-import module.support.model.Message;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,7 @@ public class LiveSupportMessageDelayWorkerThread implements WorkerThread, Runnab
     private static final Logger logger = LoggerFactory.getLogger(LiveSupportMessageDelayWorkerThread.class);
 
     @Autowired
-    private MessageAdminPusherService messageAdminPusherService;
+    private MessagePusherService messagePusherService;
 
     @Autowired
     private RedisService redisService;
@@ -59,7 +58,7 @@ public class LiveSupportMessageDelayWorkerThread implements WorkerThread, Runnab
                 while (it.hasNext()) {
                     Map.Entry<Object, Object> entry = it.next();
                     cancel.add((String)entry.getKey());
-                    Message message=   (Message)entry.getValue();
+                    module.support.model.Message message=   (module.support.model.Message)entry.getValue();
                     AdminMessage adminMessage=new AdminMessage();
                     adminMessage.setChannel(AdminMessage.channel_support);
                     adminMessage.setType(AdminMessage.type_new);
@@ -70,10 +69,10 @@ public class LiveSupportMessageDelayWorkerThread implements WorkerThread, Runnab
                     /**
                      * 事件通知
                      */
-                    messageAdminPusherService.receive(adminMessage);
+                    messagePusherService.admin(adminMessage);
 
                 }
-                redisService.hdel(Constants.redis_support_delay,cancel);
+                redisService.hdel(Constants.redis_support_delay);
 
 
             } catch (Throwable t) {
@@ -82,17 +81,17 @@ public class LiveSupportMessageDelayWorkerThread implements WorkerThread, Runnab
                 /**
                  * 1分钟
                  */
-                ThreadUtils.sleep(1000 * 60 * 1);
+                ThreadUtils.sleep(1000 * 1 * 1);
             }
 
         }
 
     }
 
-    String html(Message message){
+    String html(module.support.model.Message message){
         StringBuilder  html=new StringBuilder("新的客服消息");
         html.append("\\n");
-        if (Message.MSG_TYPE_TEXT.equals(message.getType())){
+        if (module.support.model.Message.MSG_TYPE_TEXT.equals(message.getType())){
             if (message.getContent().length()>12) {
                 html.append(message.getContent().substring(0, 12)+"...");
             }else {
