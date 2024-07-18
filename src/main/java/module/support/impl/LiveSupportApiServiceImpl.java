@@ -71,6 +71,9 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
     @Transactional
     public void send(IdSession session, String type, String content) {
 
+        if (StringUtils.isEmpty(content)){
+            return;
+        }
 
         /**
          * 确认Chat是否存在
@@ -132,8 +135,11 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         messageList.add(message);
         liveSupportAdminPusherService.receive(messageList);
 
-        //事件通知
+        /**
+         * 提示延后推送
+         */
         liveSupportAdminPusherService.message(messageList);
+
         /**
          * 消息脚标更新
          */

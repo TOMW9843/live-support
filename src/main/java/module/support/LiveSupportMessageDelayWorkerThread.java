@@ -81,7 +81,7 @@ public class LiveSupportMessageDelayWorkerThread implements WorkerThread, Runnab
                 /**
                  * 1分钟
                  */
-                ThreadUtils.sleep(1000 * 1 * 1);
+                ThreadUtils.sleep(1000 * 60 * 1);
             }
 
         }

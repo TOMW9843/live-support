@@ -61,6 +61,9 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
 
     @Override
     public void send(Long chatid, String type, String content) {
+        if (StringUtils.isEmpty(content)){
+            return;
+        }
         /**
          * 确认Chat是否存在
          */
