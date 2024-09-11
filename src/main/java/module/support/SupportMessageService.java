@@ -22,7 +22,7 @@ public interface SupportMessageService {
     /**
      * 批量删除
      */
-    public void deleteBatchById(List<Long> msgIds);
+    void deleteBatchById(List<Long> msgIds);
 
 
 

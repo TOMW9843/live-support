@@ -13,7 +13,7 @@ public interface DubboLiveSupportAdminService {
     /**
      * 已读回执
      */
-    public Long read(Long chatId);
+    Long read(Long chatId);
 
     /**
      * 撤回消息

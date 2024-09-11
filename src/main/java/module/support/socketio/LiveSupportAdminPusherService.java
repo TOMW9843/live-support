@@ -13,20 +13,20 @@ public interface LiveSupportAdminPusherService {
     /**
      * 用户列表更新
      */
-    public void user(List<Chat> entityList);
+    void user(List<Chat> entityList);
 
     /**
      * 消息推送
      */
-    public void receive(List<Message> entityList);
+    void receive(List<Message> entityList);
 
     /**
      * 消息延后推送
      */
-    public void  message(List<Message> entityList);
+    void  message(List<Message> entityList);
 
     /**
      * 消息撤回
      */
-    public void delmsg(Long chatId,List<Long> msgIds);
+    void delmsg(Long chatId, List<Long> msgIds);
 }

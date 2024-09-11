@@ -68,10 +68,7 @@ public class SupportChatServiceImpl extends ServiceImpl<SupportChatMapper, Chat>
             ew.eq(Chat::getNoLoginId, noLoginId);
             chat= this.getOne(ew);
         }
-        if (chat!=null){
-            return chat;
-        }
-        return null;
+        return chat;
 
     }
 

@@ -13,7 +13,7 @@ public interface LiveSupportApiService {
     /**
      * 连接
      */
-    public void connect(IdSession session);
+    void connect(IdSession session);
 
     /**
      * 发送消息
@@ -28,7 +28,7 @@ public interface LiveSupportApiService {
      * 图片类型内容是URL地址
      * 富文本类型内容是JOSN内容
      */
-    public void send(IdSession session, String type, String content);
+    void send(IdSession session, String type, String content);
 
 
     /**
@@ -39,5 +39,5 @@ public interface LiveSupportApiService {
      * 已读回执
      * @return 已读时间戳
      */
-    public Long read(Long partyId,String noLoginId);
+    Long read(Long partyId, String noLoginId);
 }

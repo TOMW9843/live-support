@@ -13,9 +13,9 @@ public interface LiveSupportApiPusherService {
     /**
      * 消息推送
      */
-    public void receive(IdSession session, List<Message> entityList);
+    void receive(IdSession session, List<Message> entityList);
     /**
      * 消息撤回
      */
-    public void delmsg(IdSession session, List<Long> msgIds);
+    void delmsg(IdSession session, List<Long> msgIds);
 }

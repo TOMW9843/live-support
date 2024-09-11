@@ -12,7 +12,7 @@ public interface LiveSupportAdminService {
     /**
      * 连接
      */
-    public void connect(IdSession session);
+    void connect(IdSession session);
 
     /**
      * 发送消息
@@ -27,7 +27,7 @@ public interface LiveSupportAdminService {
      * 图片类型内容是URL地址
      * 富文本类型内容是JOSN内容
      */
-    public void send(Long chatid,  String type, String content);
+    void send(Long chatid, String type, String content);
 
     /**
      * HTTP
@@ -40,7 +40,7 @@ public interface LiveSupportAdminService {
     /**
      * 已读回执
      */
-    public Long read(Long chatid);
+    Long read(Long chatid);
 
     //管理
 
