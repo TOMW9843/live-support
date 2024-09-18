@@ -54,7 +54,6 @@ public interface LiveSupportAdminService {
      */
     void setRemark(Long chatId,String remarks);
 
-
     /**
      *加入黑名单
      */
