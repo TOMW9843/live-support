@@ -1,8 +1,8 @@
 package module.support.impl;
 
-import module.message.model.AdminMessage;
-import module.message.model.ApiMessage;
-import module.message.MessagePusherService;
+import boot.message.MessageHandler;
+import boot.message.MessageQueue;
+import module.message.socketio.MessagePusherService;
 import module.redis.RedisService;
 import module.socketio.IdSession;
 import module.socketio.IdSessionManager;
@@ -21,10 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
@@ -46,10 +43,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
     RedisService redisService;
 
     @Autowired
-    MessagePusherService messagePusherService;
-
-    @Autowired
-    private MessagePusherService messageAdminPusherService;
+    private MessageHandler messageHandler;
 
 
 
@@ -120,12 +114,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         /**
          * API端脚标通知
          */
-        ApiMessage apiMessage=new ApiMessage();
-        apiMessage.setChannel(ApiMessage.channel_support);
-        apiMessage.setNum(chat.getUserUnread());
-        apiMessage.setPartyId(chat.getPartyId());
-        apiMessage.setNoLoginId(chat.getNoLoginId());
-        messagePusherService.api(null,apiMessage);
+        messageHandler.api(MessageQueue.cmdupdate, MessageQueue.support,chat.getPartyId(), chat.getNoLoginId(),  null);
 
 
     }
@@ -165,19 +154,7 @@ public class LiveSupportAdminServiceImpl implements LiveSupportAdminService {
         /**
          * 消息脚标更新
          */
-        AdminMessage adminMessage=new AdminMessage();
-        adminMessage.setChannel(AdminMessage.channel_support);
-        adminMessage.setType(AdminMessage.type_update);
-        /**
-         * 未回复客服消息
-         */
-        Map<Object, Object> chatmap = redisService.hmget(Constants.redis_support_chat);
-        int num = 0;
-        for (Object value : chatmap.values()) {
-            num = num + ((Chat) value).getSupporterUnread();
-        }
-        adminMessage.setNum(num);
-        messagePusherService.admin(adminMessage);
+        messageHandler.admin(MessageQueue.cmdupdate, MessageQueue.support, null);
 
 
         return chat.getSupporterReadTime();

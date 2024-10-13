@@ -1,10 +1,11 @@
 package module.support;
 
+import boot.message.MessageHandler;
+import boot.message.MessageQueue;
 import common.util.DateTimeUtil;
 import common.util.ThreadUtils;
 import framework.context.WorkerThread;
-import module.message.MessagePusherService;
-import module.message.model.AdminMessage;
+import module.message.socketio.MessagePusherService;
 import module.redis.RedisService;
 import module.support.model.Chat;
 import org.slf4j.Logger;
@@ -12,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 
@@ -19,11 +21,12 @@ import java.util.*;
 public class LiveSupportMessageDelayWorkerThread implements WorkerThread, Runnable {
     private static final Logger logger = LoggerFactory.getLogger(LiveSupportMessageDelayWorkerThread.class);
 
-    @Autowired
-    private MessagePusherService messagePusherService;
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private MessageHandler messageHandler;
 
     private Thread thread;
 
@@ -59,17 +62,11 @@ public class LiveSupportMessageDelayWorkerThread implements WorkerThread, Runnab
                     Map.Entry<Object, Object> entry = it.next();
                     cancel.add((String)entry.getKey());
                     module.support.model.Message message=   (module.support.model.Message)entry.getValue();
-                    AdminMessage adminMessage=new AdminMessage();
-                    adminMessage.setChannel(AdminMessage.channel_support);
-                    adminMessage.setType(AdminMessage.type_new);
-                    adminMessage.setNum(num);
-                    adminMessage.setText(message.getContent());
-                    String html=html(message);
-                    adminMessage.setHtml(html);
-                    /**
-                     * 事件通知
-                     */
-                    messagePusherService.admin(adminMessage);
+
+                    Map<String, Object> data = new HashMap<>();
+                    data.put("time", message.getCreatedTime());
+                    data.put("content", message.getContent());
+                    messageHandler.admin(MessageQueue.cmdnew, MessageQueue.support, data);
 
                 }
                 redisService.del(Constants.redis_support_delay);

@@ -1,9 +1,8 @@
 package module.support.impl;
 
 
-import module.message.model.AdminMessage;
-import module.message.model.ApiMessage;
-import module.message.MessagePusherService;
+import boot.message.MessageHandler;
+import boot.message.MessageQueue;
 import module.redis.RedisService;
 import module.socketio.IdSession;
 import module.support.Constants;
@@ -42,10 +41,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
     RedisService redisService;
 
     @Autowired
-    private MessagePusherService messageAdminPusherService;
-
-    @Autowired
-    private MessagePusherService messagePusherService;
+    private MessageHandler messageHandler;
 
 
     @Override
@@ -143,19 +139,8 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         /**
          * 消息脚标更新
          */
-        AdminMessage adminMessage=new AdminMessage();
-        adminMessage.setChannel(AdminMessage.channel_support);
-        adminMessage.setType(AdminMessage.type_update);
-        /**
-         * 未回复客服消息
-         */
-        Map<Object, Object> chatmap = redisService.hmget(Constants.redis_support_chat);
-        int num = 0;
-        for (Object value : chatmap.values()) {
-            num = num + ((Chat) value).getSupporterUnread();
-        }
-        adminMessage.setNum(num);
-        messagePusherService.admin(adminMessage);
+        messageHandler.admin(MessageQueue.cmdupdate, MessageQueue.support, null);
+
 
         //api
         liveSupportApiPusherService.receive(session, messageList);
@@ -178,12 +163,7 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         chat.setUserReadTime(System.currentTimeMillis());
         supportChatService.modify(chat);
 
-        ApiMessage message=new ApiMessage();
-        message.setPartyId(partyId);
-        message.setNoLoginId(noLoginId);
-        message.setChannel(ApiMessage.channel_support);
-        message.setNum(chat.getUserUnread());
-        messagePusherService.api(null,message);
+        messageHandler.api(MessageQueue.cmdupdate, MessageQueue.support,chat.getPartyId(), chat.getNoLoginId(),  null);
 
         return chat.getUserReadTime();
 
