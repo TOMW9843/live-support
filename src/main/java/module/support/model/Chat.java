@@ -71,7 +71,7 @@ public class Chat extends EntityObject<Chat> implements Comparable<Chat> {
         if (this.lastTime > chat.getLastTime()) {
             return -1;
         } else if (this.lastTime < chat.getLastTime()) {
-            return 1;
+            return -1;
         }
         return 0;
     }
