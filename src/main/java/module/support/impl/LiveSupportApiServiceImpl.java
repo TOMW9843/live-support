@@ -156,9 +156,6 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
             return System.currentTimeMillis();
         }
 
-        if ( chat.getUserUnread()<=0){
-            return chat.getUserReadTime();
-        }
         chat.setUserUnread(0);
         chat.setUserReadTime(System.currentTimeMillis());
         supportChatService.modify(chat);
