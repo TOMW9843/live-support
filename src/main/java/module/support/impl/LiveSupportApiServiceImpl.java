@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -131,16 +132,10 @@ public class LiveSupportApiServiceImpl implements LiveSupportApiService {
         messageList.add(message);
         liveSupportAdminPusherService.receive(messageList);
 
-        /**
-         * 提示延后推送
-         */
-        liveSupportAdminPusherService.message(messageList);
 
-        /**
-         * 消息脚标更新
-         */
-        messageHandler.admin(MessageQueue.cmdupdate, MessageQueue.support, null);
-
+        //提示推送
+        Map<String, Object> data = new HashMap<>();
+        messageHandler.admin(MessageQueue.cmdnew, MessageQueue.support, data);
 
         //api
         liveSupportApiPusherService.receive(session, messageList);

@@ -79,16 +79,7 @@ public class LiveSupportAdminPusherServiceImpl implements LiveSupportAdminPusher
         messagePusher.pushMessage(LiveSupportMessageEventHandler.NAMESPACE, "receive", packet);
     }
 
-    @Override
-    public void  message(List<Message> entityList) {
-        Map<String, Object> map = new HashMap<String, Object>();
-        for (int i = 0; i < entityList.size(); i++) {
-            Message message=entityList.get(i);
-            map.put(message.getId().toString(),message);
-        }
-        redisService.hmset(Constants.redis_support_delay,map);
 
-    }
 
     @Override
     public void delmsg(Long chatId,List<Long> msgIds) {
