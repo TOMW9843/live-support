@@ -16,7 +16,7 @@
         select *
         from support_chat
         where 1=1
-        <if test="remarks != null and params != '' ">
+        <if test="params != null and params != '' ">
             and (remarks like concat('%',#{params},'%') or username = #{params})
         </if>
         order by last_time DESC
