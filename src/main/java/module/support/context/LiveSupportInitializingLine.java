@@ -33,7 +33,7 @@ public class LiveSupportInitializingLine implements InitializingLine {
         redisService.del(Constants.redis_support_chat);
         loadingToRedis();
         if (logger.isInfoEnabled()) {
-            logger.info("[ live-support ]redis缓存[ 加载完成 ]");
+            logger.info("[ live-support ] 载入redis缓存");
         }
     }
 
