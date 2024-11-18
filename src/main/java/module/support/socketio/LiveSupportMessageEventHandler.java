@@ -60,7 +60,7 @@ public class LiveSupportMessageEventHandler extends MessageEventHandler {
         IdSession session = new IdSession(client);
         String auth = session.getToken();
         if (!StringUtils.isEmpty(auth)) {
-            Token token = securityTokenService.find(auth);
+            Token token = securityTokenService.find(auth,Token.module_admin);
             if (token != null) {
                 /**
                  * 判断是否有权限
