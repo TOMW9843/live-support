@@ -13,4 +13,7 @@ public interface SupportChatMapper extends BaseMapper<Chat> {
     List<Chat> pagedQuery(@Param("lastTime")Long lastTime, @Param("pageSize")Integer pageSize);
 
     List<Chat> pagedQuery(@Param("params")String params);
+
+
+
 }
